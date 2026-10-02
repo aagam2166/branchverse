@@ -1,6 +1,7 @@
 import { prisma } from "../lib/prisma.js";
 import type { PullRequestWebhookPayload } from "../types/github.js";
 import { createDeployment } from "./deployment.service.js";
+import { destroyPreviewsForPullRequest } from "./preview.service.js";
 
 export const processWebhook = async (
   event: string | undefined,
@@ -13,7 +14,6 @@ export const processWebhook = async (
   const pr = payload.pull_request;
   const repositoryName = payload.repository.full_name;
 
-  // Find or create the repository
   const repository = await prisma.repository.upsert({
     where: {
       fullName: repositoryName,
@@ -24,7 +24,6 @@ export const processWebhook = async (
     },
   });
 
-  // Find or create the Pull Request
   const pullRequest = await prisma.pullRequest.upsert({
     where: {
       repositoryId_number: {
@@ -62,17 +61,20 @@ export const processWebhook = async (
     },
   });
 
-  // Handle the GitHub PR event
   switch (payload.action) {
     case "opened":
     case "synchronize":
       await createDeployment(
         pullRequest.id,
-        pr.head.sha
+        pr.head.sha,
+        repositoryName,
+        pr.head.ref
       );
       break;
 
     case "closed":
+      await destroyPreviewsForPullRequest(pullRequest.id);
+
       await prisma.deployment.updateMany({
         where: {
           pullRequestId: pullRequest.id,

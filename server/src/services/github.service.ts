@@ -7,7 +7,7 @@ const octokit = new Octokit({
     auth: process.env.GITHUB_TOKEN,
 });
 
-export const getPullRequest = async (owner: string, repo: string, pull_number: number) => async (
+export const getPullRequest = async (
     repository: string,
     pullNumber: number
 ) => {

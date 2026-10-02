@@ -1,16 +1,33 @@
-import {prisma} from "../lib/prisma.js";
+import { prisma } from "../lib/prisma.js";
+import { deployPreview, destroyPreviewsForPullRequest } from "./preview.service.js";
 
 export const createDeployment = async (
     pullRequestId: string,
-    commitSha: string
+    commitSha: string,
+    repositoryFullName: string,
+    branch: string
 ) => {
-    return prisma.deployment.create({
+    await destroyPreviewsForPullRequest(pullRequestId);
+
+    const deployment = await prisma.deployment.create({
         data: {
             pullRequestId,
             commitSha,
             status: "BUILDING",
         },
     });
+
+    deployPreview({
+        deploymentId: deployment.id,
+        pullRequestId,
+        repositoryFullName,
+        commitSha,
+        branch,
+    }).catch((error) => {
+        console.error(`Deployment ${deployment.id} failed:`, error);
+    });
+
+    return deployment;
 };
 
 export const updateDeploymentStatus = async (
@@ -20,12 +37,10 @@ export const updateDeploymentStatus = async (
     return prisma.deployment.update({
         where: {
             id: deploymentId,
-
         },
         data: {
             status,
         },
-
     });
 };
 

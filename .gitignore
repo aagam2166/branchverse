@@ -23,3 +23,6 @@ Thumbs.db
 
 # TypeScript
 *.tsbuildinfo
+
+# Workspaces (cloned repositories for build)
+workspaces/
