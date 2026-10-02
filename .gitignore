@@ -9,6 +9,7 @@ node_modules/
 dist/
 build/
 
+
 # Logs
 *.log
 
@@ -22,3 +23,6 @@ Thumbs.db
 
 # TypeScript
 *.tsbuildinfo
+
+# Workspaces (cloned repositories for build)
+workspaces/
