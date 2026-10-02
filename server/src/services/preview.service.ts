@@ -53,9 +53,11 @@ export const deployPreview = async (
             }
         }
 
-        // Final check: ensure there's a package.json to build
-        if (!fs.existsSync(path.join(appPath, "package.json"))) {
-            throw new Error(`No package.json found in '${appPath}'. Set appDirectory when connecting this repo.`);
+        // Ensure there's either a package.json or an index.html to build/serve
+        const hasPackageJson = fs.existsSync(path.join(appPath, "package.json"));
+        const hasIndexHtml = fs.existsSync(path.join(appPath, "index.html"));
+        if (!hasPackageJson && !hasIndexHtml) {
+            throw new Error(`No package.json or index.html found in '${appPath}'. Set appDirectory when connecting this repo.`);
         }
 
 

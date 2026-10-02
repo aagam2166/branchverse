@@ -2,16 +2,14 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
-
-RUN npm install
-
 COPY . .
 
-RUN npm run build
+RUN if [ -f package.json ]; then npm install; fi
+
+RUN if [ -f package.json ]; then npm run build || true; fi
 
 RUN npm install -g serve
 
 EXPOSE 3000
 
-CMD ["serve", "-s", "dist", "-l", "3000"]
+CMD ["sh", "-c", "if [ -d dist ]; then serve -s dist -l 3000; elif [ -d build ]; then serve -s build -l 3000; else serve -s . -l 3000; fi"]
