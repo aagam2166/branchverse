@@ -61,7 +61,8 @@ export const deployPreview = async (
             CONTAINER_INTERNAL_PORT
         );
 
-        const previewUrl = `http://localhost:${hostPort}`;
+        const host = process.env.APP_HOST || "localhost";
+        const previewUrl = `http://${host}:${hostPort}`;
         buildLogs.push(`Preview LIVE at ${previewUrl}`);
 
         await updateDeploymentInDb(deploymentId, {

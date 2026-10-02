@@ -20,7 +20,10 @@ export const cloneAtCommit = async (
         fs.rmSync(workspacePath, { recursive: true, force: true });
     }
 
-    const repoUrl = `https://github.com/${repositoryFullName}.git`;
+    const token = process.env.GITHUB_TOKEN;
+    const repoUrl = token
+        ? `https://x-access-token:${token}@github.com/${repositoryFullName}.git`
+        : `https://github.com/${repositoryFullName}.git`;
 
     execSync(
         `git clone --depth 1 "${repoUrl}" "${workspacePath}"`,

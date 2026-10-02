@@ -3,6 +3,7 @@ import cors from "cors";
 import webhookRouter from "./routes/webhook.routes.js";
 import deploymentRouter from "./routes/deployment.routes.js";
 import previewRouter from "./routes/preview.routes.js";
+import repositoryRouter from "./routes/repository.routes.js";
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(express.json());
 app.use("/api/webhooks", webhookRouter);
 app.use("/api/deployments", deploymentRouter);
 app.use("/api/previews", previewRouter);
+app.use("/api/repositories", repositoryRouter);
 
 app.listen(5000, () => {
   console.log("BranchVerse server running on port 5000");

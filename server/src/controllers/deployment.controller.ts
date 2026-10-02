@@ -9,7 +9,6 @@ export const listPullRequests = async (req: Request, res: Response) => {
                 repository: true,
                 deployments: {
                     orderBy: { createdAt: "desc" },
-                    take: 1,
                 },
             },
             orderBy: { updatedAt: "desc" },
