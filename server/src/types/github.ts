@@ -13,9 +13,16 @@ export interface PullRequestWebhookPayload {
       ref: string;
       sha: string;
     };
+
+    title: string;
+    user: {
+      login: string;
+    }
   };
 
   repository: {
     full_name: string;
   };
+
+
 }

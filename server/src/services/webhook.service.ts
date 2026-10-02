@@ -1,38 +1,89 @@
+import { prisma } from "../lib/prisma.js";
 import type { PullRequestWebhookPayload } from "../types/github.js";
+import { createDeployment } from "./deployment.service.js";
 
-export const processWebhook = (
+export const processWebhook = async (
   event: string | undefined,
   payload: PullRequestWebhookPayload
-): void => {
-  console.log("GitHub Event:", event);
-
+): Promise<void> => {
   if (event !== "pull_request") {
     return;
   }
 
   const pr = payload.pull_request;
+  const repositoryName = payload.repository.full_name;
 
-  console.log("Repository:", payload.repository.full_name);
-  console.log("PR Number:", payload.number);
-  console.log("Branch:", pr.head.ref);
-  console.log("Commit:", pr.head.sha);
-  console.log("Action:", payload.action);
+  // Find or create the repository
+  const repository = await prisma.repository.upsert({
+    where: {
+      fullName: repositoryName,
+    },
+    update: {},
+    create: {
+      fullName: repositoryName,
+    },
+  });
 
+  // Find or create the Pull Request
+  const pullRequest = await prisma.pullRequest.upsert({
+    where: {
+      repositoryId_number: {
+        repositoryId: repository.id,
+        number: payload.number,
+      },
+    },
+    update: {
+      title: pr.title,
+      author: pr.user.login,
+      branch: pr.head.ref,
+      latestCommitSha: pr.head.sha,
+      state:
+        payload.action === "closed"
+          ? pr.merged
+            ? "MERGED"
+            : "CLOSED"
+          : "OPEN",
+      closedAt: payload.action === "closed" ? new Date() : null,
+    },
+    create: {
+      repositoryId: repository.id,
+      number: payload.number,
+      title: pr.title,
+      author: pr.user.login,
+      branch: pr.head.ref,
+      latestCommitSha: pr.head.sha,
+      state:
+        payload.action === "closed"
+          ? pr.merged
+            ? "MERGED"
+            : "CLOSED"
+          : "OPEN",
+      closedAt: payload.action === "closed" ? new Date() : null,
+    },
+  });
+
+  // Handle the GitHub PR event
   switch (payload.action) {
     case "opened":
-      console.log("Create preview environment");
-      break;
-
     case "synchronize":
-      console.log("Redeploy preview environment");
+      await createDeployment(
+        pullRequest.id,
+        pr.head.sha
+      );
       break;
 
     case "closed":
-      if (pr.merged) {
-        console.log("PR merged");
-      } else {
-        console.log("PR closed - destroy preview");
-      }
+      await prisma.deployment.updateMany({
+        where: {
+          pullRequestId: pullRequest.id,
+          status: {
+            notIn: ["CLOSED", "MERGED"],
+          },
+        },
+        data: {
+          status: pr.merged ? "MERGED" : "CLOSED",
+        },
+      });
       break;
   }
 };
