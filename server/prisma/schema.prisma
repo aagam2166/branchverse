@@ -1,7 +1,71 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum DeploymentStatus {
+  BUILDING
+  DEPLOYING
+  LIVE
+  BUILD_FAILED
+  CLOSED
+  MERGED
+}
+
+enum PullRequestState {
+  OPEN
+  CLOSED
+  MERGED
+}
+
+model Repository {
+  id            String        @id @default(uuid())
+  fullName      String        @unique
+  defaultBranch String        @default("main")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  pullRequests  PullRequest[]
+}
+
+model PullRequest {
+  id              String            @id @default(uuid())
+  repositoryId    String
+  number          Int
+  title           String
+  author          String
+  branch          String
+  latestCommitSha String
+  state           PullRequestState  @default(OPEN)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  closedAt        DateTime?
+
+  repository      Repository        @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  deployments     Deployment[]
+
+  @@unique([repositoryId, number])
+  @@index([repositoryId])
+}
+
+model Deployment {
+  id           String           @id @default(uuid())
+  pullRequestId String
+  commitSha    String
+  status       DeploymentStatus @default(BUILDING)
+  previewUrl   String?
+  containerId  String?
+  hostPort     Int?
+  buildLogs    String?          @db.Text
+  errorMessage String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  pullRequest  PullRequest      @relation(fields: [pullRequestId], references: [id], onDelete: Cascade)
+
+  @@index([pullRequestId, createdAt])
 }
