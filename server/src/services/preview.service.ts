@@ -11,7 +11,7 @@ const CONTAINER_INTERNAL_PORT = 3000;
 export const deployPreview = async (
     request: DeployPreviewRequest
 ): Promise<DeployPreviewResult> => {
-    const { deploymentId, repositoryFullName, commitSha } = request;
+    const { deploymentId, repositoryFullName, commitSha, branch } = request;
     const buildLogs: string[] = [];
 
     try {
@@ -21,13 +21,47 @@ export const deployPreview = async (
         const workspacePath = await cloneAtCommit(
             repositoryFullName,
             commitSha,
-            deploymentId
+            deploymentId,
+            branch
         );
         buildLogs.push(`Workspace ready at ${workspacePath}`);
+        // Check if the repo has a stored appDirectory config in DB
+        const repoConfig = await (prisma as any).repository.findUnique({
+            where: { fullName: repositoryFullName },
+            select: { appDirectory: true },
+        });
+
+        let appPath = workspacePath;
+
+        if (repoConfig?.appDirectory) {
+            // Use explicitly configured directory
+            appPath = path.join(workspacePath, repoConfig.appDirectory);
+            buildLogs.push(`Using configured app directory: ${repoConfig.appDirectory}/`);
+        } else {
+            // Auto-detect from common frontend subdirectory names
+            const frontendDirs = ["frontend", "client", "web", "app"];
+            for (const dir of frontendDirs) {
+                const candidatePath = path.join(workspacePath, dir);
+                if (
+                    fs.existsSync(candidatePath) &&
+                    fs.existsSync(path.join(candidatePath, "package.json"))
+                ) {
+                    appPath = candidatePath;
+                    buildLogs.push(`Detected frontend directory: ${dir}/`);
+                    break;
+                }
+            }
+        }
+
+        // Final check: ensure there's a package.json to build
+        if (!fs.existsSync(path.join(appPath, "package.json"))) {
+            throw new Error(`No package.json found in '${appPath}'. Set appDirectory when connecting this repo.`);
+        }
+
 
         fs.copyFileSync(
             PREVIEW_DOCKERFILE,
-            path.join(workspacePath, "Dockerfile")
+            path.join(appPath, "Dockerfile")
         );
         buildLogs.push("Dockerfile copied to workspace");
 
@@ -35,7 +69,7 @@ export const deployPreview = async (
         buildLogs.push(`Building Docker image: ${imageName}...`);
 
         const dockerBuildLogs = await dockerService.buildImage(
-            workspacePath,
+            appPath,
             imageName
         );
         buildLogs.push(...dockerBuildLogs);

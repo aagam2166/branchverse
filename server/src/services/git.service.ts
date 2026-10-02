@@ -11,7 +11,8 @@ if (!fs.existsSync(WORKSPACES_ROOT)) {
 export const cloneAtCommit = async (
     repositoryFullName: string,
     commitSha: string,
-    deploymentId: string
+    deploymentId: string,
+    branch: string = "main"
 ): Promise<string> => {
 
     const workspacePath = path.join(WORKSPACES_ROOT, deploymentId);
@@ -22,16 +23,13 @@ export const cloneAtCommit = async (
 
     const repoUrl = `https://github.com/${repositoryFullName}.git`;
 
+    // Clone the specific branch (shallow) to ensure the commit is reachable
     execSync(
-        `git clone --depth 1 "${repoUrl}" "${workspacePath}"`,
+        `git clone --single-branch --branch "${branch}" "${repoUrl}" "${workspacePath}"`,
         { stdio: "pipe", timeout: 120_000 }
     );
 
-    execSync(
-        `git fetch origin ${commitSha}`,
-        { cwd: workspacePath, stdio: "pipe", timeout: 120_000 }
-    );
-
+    // Checkout the exact commit SHA
     execSync(
         `git checkout ${commitSha}`,
         { cwd: workspacePath, stdio: "pipe", timeout: 30_000 }

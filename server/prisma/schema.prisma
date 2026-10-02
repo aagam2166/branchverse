@@ -26,6 +26,9 @@ model Repository {
   id            String        @id @default(uuid())
   fullName      String        @unique
   defaultBranch String        @default("main")
+  appDirectory  String?
+  webhookSecret String?
+  webhookId     Int?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
