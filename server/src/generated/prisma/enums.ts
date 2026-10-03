@@ -15,7 +15,9 @@ export const DeploymentStatus = {
   LIVE: 'LIVE',
   BUILD_FAILED: 'BUILD_FAILED',
   CLOSED: 'CLOSED',
-  MERGED: 'MERGED'
+  MERGED: 'MERGED',
+  EXPIRED: 'EXPIRED',
+  SUPERSEDED: 'SUPERSEDED'
 } as const
 
 export type DeploymentStatus = (typeof DeploymentStatus)[keyof typeof DeploymentStatus]

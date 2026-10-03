@@ -1,15 +1,27 @@
 import type { Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
 import dockerService from "../services/docker.service.js";
+import type { AuthRequest } from "../middlewares/auth.middleware.js";
 
-export const listPullRequests = async (req: Request, res: Response) => {
+export const listPullRequests = async (req: AuthRequest, res: Response) => {
     try {
+        const userId = req.user?.id;
+        if (!userId) {
+            res.json({ pullRequests: [] });
+            return;
+        }
+
         const pullRequests = await prisma.pullRequest.findMany({
+            where: {
+                repository: {
+                    userId: userId,
+                },
+            },
             include: {
                 repository: true,
                 deployments: {
                     orderBy: { createdAt: "desc" },
-                    take: 1,
+                    take: 10,
                 },
             },
             orderBy: { updatedAt: "desc" },

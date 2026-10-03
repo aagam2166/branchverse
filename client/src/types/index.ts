@@ -4,7 +4,9 @@ export type DeploymentStatus =
   | "LIVE" 
   | "BUILD_FAILED" 
   | "CLOSED" 
-  | "MERGED";
+  | "MERGED"
+  | "EXPIRED"
+  | "SUPERSEDED";
 
 export type PullRequestState = "OPEN" | "CLOSED" | "MERGED";
 
@@ -13,7 +15,14 @@ export interface Repository {
   fullName: string;
   defaultBranch: string;
   appDirectory?: string | null;
+  buildCommand?: string | null;
+  installCommand?: string | null;
+  productionUrl?: string | null;
   webhookSecret?: string | null;
+  baselineContainerId?: string | null;
+  baselinePort?: number | null;
+  baselineUrl?: string | null;
+  baselineStatus?: string | null;
   createdAt: string;
   updatedAt: string;
 }

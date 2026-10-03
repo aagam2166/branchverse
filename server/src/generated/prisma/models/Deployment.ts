@@ -44,6 +44,7 @@ export type DeploymentMinAggregateOutputType = {
   hostPort: number | null
   buildLogs: string | null
   errorMessage: string | null
+  expiresAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -58,6 +59,7 @@ export type DeploymentMaxAggregateOutputType = {
   hostPort: number | null
   buildLogs: string | null
   errorMessage: string | null
+  expiresAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -72,6 +74,7 @@ export type DeploymentCountAggregateOutputType = {
   hostPort: number
   buildLogs: number
   errorMessage: number
+  expiresAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -96,6 +99,7 @@ export type DeploymentMinAggregateInputType = {
   hostPort?: true
   buildLogs?: true
   errorMessage?: true
+  expiresAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -110,6 +114,7 @@ export type DeploymentMaxAggregateInputType = {
   hostPort?: true
   buildLogs?: true
   errorMessage?: true
+  expiresAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -124,6 +129,7 @@ export type DeploymentCountAggregateInputType = {
   hostPort?: true
   buildLogs?: true
   errorMessage?: true
+  expiresAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -225,6 +231,7 @@ export type DeploymentGroupByOutputType = {
   hostPort: number | null
   buildLogs: string | null
   errorMessage: string | null
+  expiresAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: DeploymentCountAggregateOutputType | null
@@ -262,6 +269,7 @@ export type DeploymentWhereInput = {
   hostPort?: Prisma.IntNullableFilter<"Deployment"> | number | null
   buildLogs?: Prisma.StringNullableFilter<"Deployment"> | string | null
   errorMessage?: Prisma.StringNullableFilter<"Deployment"> | string | null
+  expiresAt?: Prisma.DateTimeNullableFilter<"Deployment"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Deployment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Deployment"> | Date | string
   pullRequest?: Prisma.XOR<Prisma.PullRequestScalarRelationFilter, Prisma.PullRequestWhereInput>
@@ -277,6 +285,7 @@ export type DeploymentOrderByWithRelationInput = {
   hostPort?: Prisma.SortOrderInput | Prisma.SortOrder
   buildLogs?: Prisma.SortOrderInput | Prisma.SortOrder
   errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
+  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   pullRequest?: Prisma.PullRequestOrderByWithRelationInput
@@ -295,6 +304,7 @@ export type DeploymentWhereUniqueInput = Prisma.AtLeast<{
   hostPort?: Prisma.IntNullableFilter<"Deployment"> | number | null
   buildLogs?: Prisma.StringNullableFilter<"Deployment"> | string | null
   errorMessage?: Prisma.StringNullableFilter<"Deployment"> | string | null
+  expiresAt?: Prisma.DateTimeNullableFilter<"Deployment"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Deployment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Deployment"> | Date | string
   pullRequest?: Prisma.XOR<Prisma.PullRequestScalarRelationFilter, Prisma.PullRequestWhereInput>
@@ -310,6 +320,7 @@ export type DeploymentOrderByWithAggregationInput = {
   hostPort?: Prisma.SortOrderInput | Prisma.SortOrder
   buildLogs?: Prisma.SortOrderInput | Prisma.SortOrder
   errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
+  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.DeploymentCountOrderByAggregateInput
@@ -332,6 +343,7 @@ export type DeploymentScalarWhereWithAggregatesInput = {
   hostPort?: Prisma.IntNullableWithAggregatesFilter<"Deployment"> | number | null
   buildLogs?: Prisma.StringNullableWithAggregatesFilter<"Deployment"> | string | null
   errorMessage?: Prisma.StringNullableWithAggregatesFilter<"Deployment"> | string | null
+  expiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Deployment"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Deployment"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Deployment"> | Date | string
 }
@@ -345,6 +357,7 @@ export type DeploymentCreateInput = {
   hostPort?: number | null
   buildLogs?: string | null
   errorMessage?: string | null
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   pullRequest: Prisma.PullRequestCreateNestedOneWithoutDeploymentsInput
@@ -360,6 +373,7 @@ export type DeploymentUncheckedCreateInput = {
   hostPort?: number | null
   buildLogs?: string | null
   errorMessage?: string | null
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -373,6 +387,7 @@ export type DeploymentUpdateInput = {
   hostPort?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   buildLogs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pullRequest?: Prisma.PullRequestUpdateOneRequiredWithoutDeploymentsNestedInput
@@ -388,6 +403,7 @@ export type DeploymentUncheckedUpdateInput = {
   hostPort?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   buildLogs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -402,6 +418,7 @@ export type DeploymentCreateManyInput = {
   hostPort?: number | null
   buildLogs?: string | null
   errorMessage?: string | null
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -415,6 +432,7 @@ export type DeploymentUpdateManyMutationInput = {
   hostPort?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   buildLogs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -429,6 +447,7 @@ export type DeploymentUncheckedUpdateManyInput = {
   hostPort?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   buildLogs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -453,6 +472,7 @@ export type DeploymentCountOrderByAggregateInput = {
   hostPort?: Prisma.SortOrder
   buildLogs?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -471,6 +491,7 @@ export type DeploymentMaxOrderByAggregateInput = {
   hostPort?: Prisma.SortOrder
   buildLogs?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -485,6 +506,7 @@ export type DeploymentMinOrderByAggregateInput = {
   hostPort?: Prisma.SortOrder
   buildLogs?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -548,6 +570,7 @@ export type DeploymentCreateWithoutPullRequestInput = {
   hostPort?: number | null
   buildLogs?: string | null
   errorMessage?: string | null
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -561,6 +584,7 @@ export type DeploymentUncheckedCreateWithoutPullRequestInput = {
   hostPort?: number | null
   buildLogs?: string | null
   errorMessage?: string | null
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -604,6 +628,7 @@ export type DeploymentScalarWhereInput = {
   hostPort?: Prisma.IntNullableFilter<"Deployment"> | number | null
   buildLogs?: Prisma.StringNullableFilter<"Deployment"> | string | null
   errorMessage?: Prisma.StringNullableFilter<"Deployment"> | string | null
+  expiresAt?: Prisma.DateTimeNullableFilter<"Deployment"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Deployment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Deployment"> | Date | string
 }
@@ -617,6 +642,7 @@ export type DeploymentCreateManyPullRequestInput = {
   hostPort?: number | null
   buildLogs?: string | null
   errorMessage?: string | null
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -630,6 +656,7 @@ export type DeploymentUpdateWithoutPullRequestInput = {
   hostPort?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   buildLogs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -643,6 +670,7 @@ export type DeploymentUncheckedUpdateWithoutPullRequestInput = {
   hostPort?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   buildLogs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -656,6 +684,7 @@ export type DeploymentUncheckedUpdateManyWithoutPullRequestInput = {
   hostPort?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   buildLogs?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -672,6 +701,7 @@ export type DeploymentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   hostPort?: boolean
   buildLogs?: boolean
   errorMessage?: boolean
+  expiresAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   pullRequest?: boolean | Prisma.PullRequestDefaultArgs<ExtArgs>
@@ -687,6 +717,7 @@ export type DeploymentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   hostPort?: boolean
   buildLogs?: boolean
   errorMessage?: boolean
+  expiresAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   pullRequest?: boolean | Prisma.PullRequestDefaultArgs<ExtArgs>
@@ -702,6 +733,7 @@ export type DeploymentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   hostPort?: boolean
   buildLogs?: boolean
   errorMessage?: boolean
+  expiresAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   pullRequest?: boolean | Prisma.PullRequestDefaultArgs<ExtArgs>
@@ -717,11 +749,12 @@ export type DeploymentSelectScalar = {
   hostPort?: boolean
   buildLogs?: boolean
   errorMessage?: boolean
+  expiresAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type DeploymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "pullRequestId" | "commitSha" | "status" | "previewUrl" | "containerId" | "hostPort" | "buildLogs" | "errorMessage" | "createdAt" | "updatedAt", ExtArgs["result"]["deployment"]>
+export type DeploymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "pullRequestId" | "commitSha" | "status" | "previewUrl" | "containerId" | "hostPort" | "buildLogs" | "errorMessage" | "expiresAt" | "createdAt" | "updatedAt", ExtArgs["result"]["deployment"]>
 export type DeploymentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pullRequest?: boolean | Prisma.PullRequestDefaultArgs<ExtArgs>
 }
@@ -747,6 +780,7 @@ export type $DeploymentPayload<ExtArgs extends runtime.Types.Extensions.Internal
     hostPort: number | null
     buildLogs: string | null
     errorMessage: string | null
+    expiresAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["deployment"]>
@@ -1182,6 +1216,7 @@ export interface DeploymentFieldRefs {
   readonly hostPort: Prisma.FieldRef<"Deployment", 'Int'>
   readonly buildLogs: Prisma.FieldRef<"Deployment", 'String'>
   readonly errorMessage: Prisma.FieldRef<"Deployment", 'String'>
+  readonly expiresAt: Prisma.FieldRef<"Deployment", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Deployment", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Deployment", 'DateTime'>
 }

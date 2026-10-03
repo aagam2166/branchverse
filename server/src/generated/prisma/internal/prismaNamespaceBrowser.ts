@@ -52,6 +52,7 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Repository: 'Repository',
+  User: 'User',
   PullRequest: 'PullRequest',
   Deployment: 'Deployment'
 } as const
@@ -77,13 +78,35 @@ export const RepositoryScalarFieldEnum = {
   fullName: 'fullName',
   defaultBranch: 'defaultBranch',
   appDirectory: 'appDirectory',
-  webhookSecret: 'webhookSecret',
+  buildCommand: 'buildCommand',
+  installCommand: 'installCommand',
+  productionUrl: 'productionUrl',
   webhookId: 'webhookId',
+  webhookSecret: 'webhookSecret',
+  userId: 'userId',
+  baselineContainerId: 'baselineContainerId',
+  baselinePort: 'baselinePort',
+  baselineUrl: 'baselineUrl',
+  baselineStatus: 'baselineStatus',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type RepositoryScalarFieldEnum = (typeof RepositoryScalarFieldEnum)[keyof typeof RepositoryScalarFieldEnum]
+
+
+export const UserScalarFieldEnum = {
+  id: 'id',
+  githubId: 'githubId',
+  username: 'username',
+  email: 'email',
+  avatarUrl: 'avatarUrl',
+  accessToken: 'accessToken',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
 export const PullRequestScalarFieldEnum = {
@@ -113,6 +136,7 @@ export const DeploymentScalarFieldEnum = {
   hostPort: 'hostPort',
   buildLogs: 'buildLogs',
   errorMessage: 'errorMessage',
+  expiresAt: 'expiresAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

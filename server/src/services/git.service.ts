@@ -12,7 +12,8 @@ export const cloneAtCommit = async (
     repositoryFullName: string,
     commitSha: string,
     deploymentId: string,
-    branch: string = "main"
+    branch: string = "main",
+    accessToken?: string
 ): Promise<string> => {
 
     const workspacePath = path.join(WORKSPACES_ROOT, deploymentId);
@@ -21,7 +22,10 @@ export const cloneAtCommit = async (
         fs.rmSync(workspacePath, { recursive: true, force: true });
     }
 
-    const repoUrl = `https://github.com/${repositoryFullName}.git`;
+    const token = accessToken || process.env.GITHUB_TOKEN?.trim();
+    const repoUrl = token 
+        ? `https://x-access-token:${token}@github.com/${repositoryFullName}.git`
+        : `https://github.com/${repositoryFullName}.git`;
 
     // Clone the specific branch (shallow) to ensure the commit is reachable
     execSync(

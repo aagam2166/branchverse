@@ -398,6 +398,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   Repository: 'Repository',
+  User: 'User',
   PullRequest: 'PullRequest',
   Deployment: 'Deployment'
 } as const
@@ -415,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "repository" | "pullRequest" | "deployment"
+    modelProps: "repository" | "user" | "pullRequest" | "deployment"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -490,6 +491,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.RepositoryCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.RepositoryCountAggregateOutputType> | number
+        }
+      }
+    }
+    User: {
+      payload: Prisma.$UserPayload<ExtArgs>
+      fields: Prisma.UserFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPayload>
+        }
+        findFirst: {
+          args: Prisma.UserFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPayload>
+        }
+        findMany: {
+          args: Prisma.UserFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPayload>[]
+        }
+        create: {
+          args: Prisma.UserCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPayload>
+        }
+        createMany: {
+          args: Prisma.UserCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UserCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPayload>[]
+        }
+        delete: {
+          args: Prisma.UserDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPayload>
+        }
+        update: {
+          args: Prisma.UserUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPayload>
+        }
+        deleteMany: {
+          args: Prisma.UserDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UserUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPayload>[]
+        }
+        upsert: {
+          args: Prisma.UserUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPayload>
+        }
+        aggregate: {
+          args: Prisma.UserAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUser>
+        }
+        groupBy: {
+          args: Prisma.UserGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserCountAggregateOutputType> | number
         }
       }
     }
@@ -685,13 +760,35 @@ export const RepositoryScalarFieldEnum = {
   fullName: 'fullName',
   defaultBranch: 'defaultBranch',
   appDirectory: 'appDirectory',
-  webhookSecret: 'webhookSecret',
+  buildCommand: 'buildCommand',
+  installCommand: 'installCommand',
+  productionUrl: 'productionUrl',
   webhookId: 'webhookId',
+  webhookSecret: 'webhookSecret',
+  userId: 'userId',
+  baselineContainerId: 'baselineContainerId',
+  baselinePort: 'baselinePort',
+  baselineUrl: 'baselineUrl',
+  baselineStatus: 'baselineStatus',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type RepositoryScalarFieldEnum = (typeof RepositoryScalarFieldEnum)[keyof typeof RepositoryScalarFieldEnum]
+
+
+export const UserScalarFieldEnum = {
+  id: 'id',
+  githubId: 'githubId',
+  username: 'username',
+  email: 'email',
+  avatarUrl: 'avatarUrl',
+  accessToken: 'accessToken',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
 export const PullRequestScalarFieldEnum = {
@@ -721,6 +818,7 @@ export const DeploymentScalarFieldEnum = {
   hostPort: 'hostPort',
   buildLogs: 'buildLogs',
   errorMessage: 'errorMessage',
+  expiresAt: 'expiresAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -993,6 +1091,7 @@ export interface PrismaClientOptionsWithAdapter extends PrismaClientBaseOptions 
 export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaClientOptionsWithAdapter
 export type GlobalOmitConfig = {
   repository?: Prisma.RepositoryOmit
+  user?: Prisma.UserOmit
   pullRequest?: Prisma.PullRequestOmit
   deployment?: Prisma.DeploymentOmit
 }
