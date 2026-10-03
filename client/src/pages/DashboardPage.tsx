@@ -10,14 +10,12 @@ import { LogViewerModal } from "../components/deployment/LogViewerModal.js";
 import { SplitPreviewModal } from "../components/deployment/SplitPreviewModal.js";
 import { ConnectRepoModal } from "../components/dashboard/ConnectRepoModal.js";
 import { GitFork } from "lucide-react";
-
 export function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
 
   const [pullRequests, setPullRequests] = useState<PullRequest[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [isConnectOpen, setIsConnectOpen] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -48,8 +46,7 @@ export function DashboardPage() {
     });
   }, []);
 
-  const loadPullRequests = useCallback(async (isSilent = false) => {
-    if (!isSilent) setIsRefreshing(true);
+  const loadPullRequests = useCallback(async () => {
     try {
       const data = await fetchPullRequests();
       setPullRequests(data);
@@ -57,7 +54,6 @@ export function DashboardPage() {
       console.error("Failed to load pull requests:", err);
     } finally {
       setLoading(false);
-      setIsRefreshing(false);
     }
   }, []);
 
@@ -65,7 +61,7 @@ export function DashboardPage() {
     if (!user) return;
     loadPullRequests();
     const interval = setInterval(() => {
-      loadPullRequests(true);
+      loadPullRequests();
     }, 4000);
     return () => clearInterval(interval);
   }, [loadPullRequests, user]);
@@ -137,55 +133,22 @@ export function DashboardPage() {
             </p>
           </div>
 
-          <div className="bg-[#0b0f19]/90 border border-slate-800 rounded-2xl p-6 shadow-2xl backdrop-blur-md space-y-5 text-left">
+          <div className="bg-[#0a0a0a] border border-[#222] rounded-xl p-8 shadow-2xl space-y-6 text-center max-w-[400px] w-full mx-auto">
+            <h2 className="text-xl font-medium text-white">Log in to BranchVerse</h2>
+            <p className="text-sm text-[#888]">Continue with GitHub to build preview universes for your pull requests.</p>
             <button
               onClick={handleGitHubLogin}
-              className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-sm transition-all shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30 cursor-pointer"
+              className="w-full flex items-center justify-center gap-3 px-6 py-3 rounded-md bg-white hover:bg-neutral-200 text-black font-semibold text-sm transition-colors cursor-pointer"
             >
-              <GitFork className="h-5 w-5" />
-              <span>Sign in with GitHub</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+                <path d="M9 18c-4.51 2-5-2-7-2" />
+              </svg>
+              <span>Continue with GitHub</span>
             </button>
-
-            <div className="relative flex py-1 items-center">
-              <div className="flex-grow border-t border-slate-800"></div>
-              <span className="flex-shrink mx-3 text-[11px] text-slate-500 uppercase tracking-wider font-semibold">Testing with multiple accounts?</span>
-              <div className="flex-grow border-t border-slate-800"></div>
-            </div>
-
-            <div className="rounded-xl bg-slate-900/70 border border-slate-800/80 p-4 space-y-2.5 text-xs text-slate-300">
-              <p className="font-medium text-slate-200">
-                💡 <strong>Why GitHub signs in automatically:</strong>
-              </p>
-              <p className="text-slate-400 leading-relaxed text-[11px]">
-                GitHub OAuth connects to whichever account is currently active in this browser. To sign in with a different account (e.g. Jainam vs Aagam):
-              </p>
-              <div className="space-y-2 pt-1">
-                <div className="flex items-start gap-2">
-                  <span className="text-cyan-400 font-bold">•</span>
-                  <p className="text-slate-300 text-[11px]">
-                    <strong>Incognito Window (Fastest):</strong> Open this page in an Incognito / Private window. GitHub will show the email/password login prompt.
-                  </p>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-cyan-400 font-bold">•</span>
-                  <p className="text-slate-300 text-[11px]">
-                    <strong>Switch GitHub Session:</strong>{" "}
-                    <a
-                      href="https://github.com/logout"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-cyan-400 hover:underline font-semibold"
-                    >
-                      Sign out of github.com
-                    </a>{" "}
-                    first, then click &quot;Sign in with GitHub&quot; above.
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
-        <footer className="mt-12 text-center text-xs text-slate-600">
+        <footer className="mt-12 text-center text-xs text-[#666]">
           BranchVerse • Every PR, its own universe
         </footer>
       </div>
@@ -193,70 +156,68 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#07090e] bg-radial-grid text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-black text-white flex flex-col font-sans">
       <Navbar
-        onRefresh={() => loadPullRequests()}
-        isRefreshing={isRefreshing}
+
         onOpenConnectModal={() => setIsConnectOpen(true)}
         user={user}
         onLogout={handleLogout}
         onLogin={handleGitHubLogin}
       />
 
-      <main className="flex-1 mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
-        <div className="space-y-2">
-          <h1 className="font-heading text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-100">
-            Preview Universes
-          </h1>
-          <p className="text-slate-400 max-w-2xl text-sm sm:text-base">
-            Every GitHub Pull Request spun into a containerized universe with its own port, isolated workspace, and live preview URL.
-          </p>
-        </div>
+      <div className="flex flex-1 justify-center w-full bg-[#0a0a0a]">
+        
+        <main className="w-full max-w-5xl px-4 py-8 sm:px-6 space-y-8">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold font-heading tracking-tight text-white">
+              Projects
+            </h1>
+            <p className="text-[#888] max-w-2xl text-base">
+              Manage your connected repositories and preview deployments.
+            </p>
+          </div>
 
-        <StatCards pullRequests={pullRequests} />
+          <StatCards pullRequests={pullRequests} />
 
-        <div className="space-y-4">
-          <FilterBar
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            statusFilter={statusFilter}
-            onStatusFilterChange={setStatusFilter}
-            totalFiltered={filteredPRs.length}
-          />
-
-          {loading ? (
-            <div className="grid grid-cols-1 gap-4">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="glass-panel h-36 rounded-xl animate-pulse bg-slate-900/40 border-slate-800/50"
-                />
-              ))}
-            </div>
-          ) : filteredPRs.length === 0 ? (
-            <EmptyState
-              onOpenConnectModal={() => setIsConnectOpen(true)}
-              hasFilter={Boolean(searchQuery || statusFilter !== "ALL")}
+          <div className="space-y-4">
+            <FilterBar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              statusFilter={statusFilter}
+              onStatusFilterChange={setStatusFilter}
+              totalFiltered={filteredPRs.length}
             />
-          ) : (
-            <div className="grid grid-cols-1 gap-4">
-              {filteredPRs.map((pr) => (
-                <PullRequestCard
-                  key={pr.id}
-                  pullRequest={pr}
-                  onOpenLogs={(pr, deployment) => setSelectedLogs({ pullRequest: pr, deployment })}
-                  onOpenComparison={(pr, deployment) => setSelectedComparison({ pullRequest: pr, deployment })}
-                  onRefresh={() => loadPullRequests()}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </main>
 
-      <footer className="border-t border-slate-800/60 bg-[#07090e]/60 py-6 text-center text-xs text-slate-500">
-        <p>BranchVerse • Ephemeral Pull Request Previews Powered by Docker & GitHub Webhooks</p>
-      </footer>
+            {loading ? (
+              <div className="grid grid-cols-1 gap-4">
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="h-36 rounded-md animate-pulse bg-[#111] border border-[#222]"
+                  />
+                ))}
+              </div>
+            ) : filteredPRs.length === 0 ? (
+              <EmptyState
+                onOpenConnectModal={() => setIsConnectOpen(true)}
+                hasFilter={Boolean(searchQuery || statusFilter !== "ALL")}
+              />
+            ) : (
+              <div className="grid grid-cols-1 gap-4">
+                {filteredPRs.map((pr) => (
+                  <PullRequestCard
+                    key={pr.id}
+                    pullRequest={pr}
+                    onOpenLogs={(pr, deployment) => setSelectedLogs({ pullRequest: pr, deployment })}
+                    onOpenComparison={(pr, deployment) => setSelectedComparison({ pullRequest: pr, deployment })}
+                    onRefresh={() => loadPullRequests()}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </main>
+      </div>
 
       {selectedLogs && (
         <LogViewerModal
@@ -280,6 +241,7 @@ export function DashboardPage() {
         isOpen={isConnectOpen}
         onClose={() => setIsConnectOpen(false)}
         onRepoUpdated={() => loadPullRequests()}
+        user={user}
       />
     </div>
   );

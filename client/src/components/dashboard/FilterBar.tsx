@@ -38,8 +38,8 @@ export function FilterBar({
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <div className="flex items-center gap-1.5 mr-1 text-xs text-slate-400">
-          <Filter className="h-3.5 w-3.5 text-slate-500" />
+        <div className="flex items-center gap-1.5 mr-1 text-sm text-slate-400">
+          <Filter className="h-4 w-4 text-slate-500" />
           <span>Status:</span>
         </div>
         {filters.map((filter) => {
@@ -48,9 +48,9 @@ export function FilterBar({
             <button
               key={filter.value}
               onClick={() => onStatusFilterChange(filter.value)}
-              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-150 cursor-pointer ${
+              className={`rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 cursor-pointer ${
                 isActive
-                  ? "bg-cyan-500/15 text-cyan-300 border border-cyan-500/40 shadow-sm shadow-cyan-950"
+                  ? "bg-white text-black border border-white shadow-sm"
                   : "bg-slate-900/60 text-slate-400 border border-slate-800 hover:bg-slate-800/60 hover:text-slate-200"
               }`}
             >
@@ -58,9 +58,6 @@ export function FilterBar({
             </button>
           );
         })}
-        <span className="ml-2 text-xs font-mono text-slate-400">
-          ({totalFiltered})
-        </span>
       </div>
     </div>
   );
