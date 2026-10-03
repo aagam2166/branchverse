@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { Button } from "../ui/button.js";
 import type { PullRequest, Deployment } from "../../types/index.js";
+import { deployBaseline, fetchBaselineStatus } from "../../services/api.js";
+import { useEffect } from "react";
 
 interface SplitPreviewModalProps {
   isOpen: boolean;
@@ -29,17 +31,116 @@ export function SplitPreviewModal({
 }: SplitPreviewModalProps) {
   const [deviceMode, setDeviceMode] = useState<"desktop" | "tablet" | "mobile">("desktop");
   const [baselineUrl, setBaselineUrl] = useState<string>(
-    pullRequest.repository?.productionUrl || ""
+    pullRequest.repository?.productionUrl || pullRequest.repository?.baselineUrl || ""
   );
+  const [baselineStatus, setBaselineStatus] = useState<string | null>(
+    pullRequest.repository?.baselineStatus || null
+  );
+  const [isDeployingBaseline, setIsDeployingBaseline] = useState(false);
   const [syncScroll, setSyncScroll] = useState<boolean>(true);
   const [refreshKey, setRefreshKey] = useState<number>(0);
 
   const previewFrameRef = useRef<HTMLIFrameElement>(null);
   const baselineFrameRef = useRef<HTMLIFrameElement>(null);
 
-  if (!isOpen) return null;
-
   const previewUrl = deployment.previewUrl || `http://localhost:${deployment.hostPort || 3000}`;
+
+  useEffect(() => {
+    let intervalId: ReturnType<typeof setInterval>;
+    
+    if (baselineStatus === "BUILDING" || baselineStatus === "DEPLOYING") {
+      intervalId = setInterval(async () => {
+        try {
+          const status = await fetchBaselineStatus(pullRequest.repository.id);
+          setBaselineStatus(status.status);
+          if (status.status === "LIVE" && status.url) {
+            setBaselineUrl(status.url);
+          }
+        } catch (e) {
+          console.error("Failed to fetch baseline status", e);
+        }
+      }, 3000);
+    }
+    
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [baselineStatus, pullRequest.repository.id]);
+
+  useEffect(() => {
+    if (!syncScroll) return;
+
+    const left = previewFrameRef.current;
+    const right = baselineFrameRef.current;
+
+    let isSyncingLeft = false;
+    let isSyncingRight = false;
+
+    const handleScrollLeft = () => {
+      if (isSyncingLeft) {
+        isSyncingLeft = false;
+        return;
+      }
+      isSyncingRight = true;
+      try {
+        if (right?.contentWindow && left?.contentWindow) {
+          right.contentWindow.scrollTo(left.contentWindow.scrollX, left.contentWindow.scrollY);
+        }
+      } catch (e) {
+        // CORS blocked
+      }
+    };
+
+    const handleScrollRight = () => {
+      if (isSyncingRight) {
+        isSyncingRight = false;
+        return;
+      }
+      isSyncingLeft = true;
+      try {
+        if (left?.contentWindow && right?.contentWindow) {
+          left.contentWindow.scrollTo(right.contentWindow.scrollX, right.contentWindow.scrollY);
+        }
+      } catch (e) {
+        // CORS blocked
+      }
+    };
+
+    const attachListeners = () => {
+      try {
+        left?.contentWindow?.addEventListener("scroll", handleScrollLeft);
+        right?.contentWindow?.addEventListener("scroll", handleScrollRight);
+      } catch (e) {
+        console.warn("Cross-origin scroll sync is restricted by browser security policies.");
+      }
+    };
+
+    left?.addEventListener("load", attachListeners);
+    right?.addEventListener("load", attachListeners);
+
+    return () => {
+      left?.removeEventListener("load", attachListeners);
+      right?.removeEventListener("load", attachListeners);
+      try {
+        left?.contentWindow?.removeEventListener("scroll", handleScrollLeft);
+        right?.contentWindow?.removeEventListener("scroll", handleScrollRight);
+      } catch (e) {}
+    };
+  }, [syncScroll, previewUrl, baselineUrl, refreshKey]);
+
+  const handleDeployBaseline = async () => {
+    try {
+      setIsDeployingBaseline(true);
+      await deployBaseline(pullRequest.repository.id);
+      setBaselineStatus("BUILDING");
+    } catch (e) {
+      console.error("Failed to deploy baseline", e);
+    } finally {
+      setIsDeployingBaseline(false);
+    }
+  };
+
+  if (!isOpen) return null;
 
   const getViewportWidth = () => {
     switch (deviceMode) {
@@ -213,13 +314,51 @@ export function SplitPreviewModal({
                 <span>Baseline (Production / Main)</span>
                 <Globe className="h-3 w-3 text-cyan-400" />
               </div>
-              <iframe
-                key={`baseline-${refreshKey}`}
-                ref={baselineFrameRef}
-                src={baselineUrl}
-                title="Baseline Environment"
-                className="w-full flex-1 rounded-b-md border border-slate-800 bg-white shadow-xl"
-              />
+              {baselineUrl ? (
+                <iframe
+                  key={`baseline-${refreshKey}`}
+                  ref={baselineFrameRef}
+                  src={baselineUrl}
+                  title="Baseline Environment"
+                  className="w-full flex-1 rounded-b-md border border-slate-800 bg-white shadow-xl"
+                />
+              ) : (
+                <div className="w-full flex-1 flex flex-col items-center justify-center rounded-b-md border border-slate-800 bg-slate-950/50 shadow-xl p-6 text-center">
+                  <Globe className="h-12 w-12 text-slate-700 mb-4" />
+                  <h4 className="text-sm font-semibold text-slate-300 mb-2">No Baseline Deployed</h4>
+                  <p className="text-xs text-slate-500 max-w-[250px] mb-6">
+                    Deploy the main branch to compare this PR against your baseline.
+                  </p>
+                  
+                  {(baselineStatus === "BUILDING" || baselineStatus === "DEPLOYING") ? (
+                    <div className="flex flex-col items-center gap-3">
+                      <RefreshCw className="h-5 w-5 text-cyan-400 animate-spin" />
+                      <span className="text-xs text-cyan-400 animate-pulse">
+                        {baselineStatus === "BUILDING" ? "Building Image..." : "Deploying Container..."}
+                      </span>
+                    </div>
+                  ) : (
+                    <Button 
+                      variant="outline" 
+                      onClick={handleDeployBaseline}
+                      disabled={isDeployingBaseline}
+                      className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-950/40"
+                    >
+                      {isDeployingBaseline ? (
+                        <>
+                          <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                          Deploying...
+                        </>
+                      ) : (
+                        "Deploy Main Branch"
+                      )}
+                    </Button>
+                  )}
+                  {baselineStatus === "FAILED" && (
+                    <span className="text-xs text-red-400 mt-4">Baseline deployment failed.</span>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

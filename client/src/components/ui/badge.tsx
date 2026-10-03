@@ -15,6 +15,8 @@ const badgeVariants = cva(
         BUILD_FAILED: "bg-rose-950/70 text-rose-300 border border-rose-500/40 shadow-[0_0_12px_rgba(244,63,94,0.25)]",
         CLOSED: "bg-slate-800/80 text-slate-400 border border-slate-700/60",
         MERGED: "bg-purple-950/70 text-purple-300 border border-purple-500/40 shadow-[0_0_12px_rgba(168,85,247,0.2)]",
+        EXPIRED: "bg-slate-800/80 text-slate-400 border border-slate-700/60",
+        SUPERSEDED: "bg-slate-800/80 text-slate-400 border border-slate-700/60",
         branch: "bg-slate-900/90 text-cyan-300 border border-cyan-500/20 font-mono text-[11px]",
       },
     },
@@ -26,7 +28,7 @@ const badgeVariants = cva(
 
 export interface BadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
+  VariantProps<typeof badgeVariants> { }
 
 export function Badge({ className, variant, ...props }: BadgeProps) {
   return (
@@ -47,6 +49,8 @@ export function StatusBadge({ status }: { status: DeploymentStatus }) {
       case "MERGED":
         return <span className="h-1.5 w-1.5 rounded-full bg-purple-400 inline-block" />;
       case "CLOSED":
+      case "EXPIRED":
+      case "SUPERSEDED":
       default:
         return <span className="h-1.5 w-1.5 rounded-full bg-slate-500 inline-block" />;
     }

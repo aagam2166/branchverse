@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma.js";
-import { deployPreview, destroyPreviewsForPullRequest } from "./preview.service.js";
+import { deployPreview, destroyPreviewsForPullRequest, destroyPreview } from "./preview.service.js";
 
 export const createDeployment = async (
     pullRequestId: string,
@@ -45,6 +45,7 @@ export const updateDeploymentStatus = async (
 };
 
 export const getLatestDeployment = async (pullRequestId: string) => {
+
     return prisma.deployment.findFirst({
         where: {
             pullRequestId,
@@ -53,4 +54,28 @@ export const getLatestDeployment = async (pullRequestId: string) => {
             createdAt: "desc",
         },
     });
+};
+
+export const cleanupExpiredDeployments = async () => {
+    const expiredDeployments = await prisma.deployment.findMany({
+        where: {
+            status: "LIVE",
+            expiresAt: {
+                lt: new Date(),
+            },
+        },
+    });
+
+    for (const deployment of expiredDeployments) {
+        console.log(`Expiring deployment ${deployment.id}`);
+        try {
+            await destroyPreview(deployment.id);
+            await prisma.deployment.update({
+                where: { id: deployment.id },
+                data: { status: "EXPIRED" } as any,
+            });
+        } catch (err) {
+            console.error(`Failed to expire deployment ${deployment.id}:`, err);
+        }
+    }
 };

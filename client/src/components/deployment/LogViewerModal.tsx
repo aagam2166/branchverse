@@ -26,13 +26,23 @@ export function LogViewerModal({
   const [autoScroll, setAutoScroll] = useState(true);
   const logsEndRef = useRef<HTMLDivElement>(null);
 
+  const [selectedDeploymentId, setSelectedDeploymentId] = useState<string>("");
+
   useEffect(() => {
-    if (!isOpen) return;
+    if (isOpen && deployment) {
+      setSelectedDeploymentId(deployment.id);
+    }
+  }, [isOpen, deployment]);
+
+  const selectedDeployment = pullRequest.deployments?.find(d => d.id === selectedDeploymentId) || deployment;
+
+  useEffect(() => {
+    if (!isOpen || !selectedDeploymentId) return;
 
     let isMounted = true;
     setLoading(true);
 
-    fetchDeploymentLogs(pullRequest.id, deployment.id)
+    fetchDeploymentLogs(pullRequest.id, selectedDeploymentId)
       .then((data) => {
         if (!isMounted) return;
         setBuildLogs(data.buildLogs || "No build logs recorded.");
@@ -49,7 +59,7 @@ export function LogViewerModal({
     return () => {
       isMounted = false;
     };
-  }, [isOpen, pullRequest.id, deployment.id]);
+  }, [isOpen, pullRequest.id, selectedDeploymentId]);
 
   useEffect(() => {
     if (autoScroll && logsEndRef.current) {
@@ -75,7 +85,7 @@ export function LogViewerModal({
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `branchverse-logs-${deployment.id.slice(0, 8)}-${activeTab}.txt`;
+    a.download = `branchverse-logs-${selectedDeployment.id.slice(0, 8)}-${activeTab}.txt`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -110,11 +120,26 @@ export function LogViewerModal({
                   Execution Logs
                 </h3>
                 <span className="font-mono text-xs text-slate-400">
-                  #{pullRequest.number} ({deployment.commitSha.slice(0, 7)})
+                  #{pullRequest.number} ({selectedDeployment.commitSha.slice(0, 7)})
                 </span>
+                
+                {pullRequest.deployments && pullRequest.deployments.length > 1 && (
+                  <select
+                    value={selectedDeploymentId}
+                    onChange={(e) => setSelectedDeploymentId(e.target.value)}
+                    className="ml-4 rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-xs text-slate-300 focus:border-cyan-500 focus:outline-none"
+                  >
+                    {pullRequest.deployments.map((d, index) => (
+                      <option key={d.id} value={d.id}>
+                        {index === 0 ? "Latest " : `Version ${pullRequest.deployments.length - index} `} 
+                        ({d.commitSha.slice(0, 7)}) - {d.status}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
-              <p className="text-xs text-slate-400">
-                Deployment ID: <span className="font-mono text-slate-300">{deployment.id}</span>
+              <p className="text-xs text-slate-400 mt-1">
+                Deployment ID: <span className="font-mono text-slate-300">{selectedDeployment.id}</span>
               </p>
             </div>
           </div>

@@ -17,19 +17,26 @@ export const deployPreview = async (
 
     try {
         await updateDeploymentInDb(deploymentId, { status: "BUILDING" });
-        buildLogs.push(`Cloning ${repositoryFullName} at commit ${commitSha}...`);
+        const repoConfig = await (prisma as any).repository.findUnique({
+            where: { fullName: repositoryFullName },
+            select: {
+                appDirectory: true,
+                buildCommand: true,
+                installCommand: true,
+                user: { select: { accessToken: true } }
+            },
+        });
+
+        const userAccessToken = repoConfig?.user?.accessToken;
 
         const workspacePath = await cloneAtCommit(
             repositoryFullName,
             commitSha,
             deploymentId,
-            branch
+            branch,
+            userAccessToken
         );
         buildLogs.push(`Workspace ready at ${workspacePath}`);
-        const repoConfig = await prisma.repository.findUnique({
-            where: { fullName: repositoryFullName },
-            select: { appDirectory: true, buildCommand: true, installCommand: true },
-        });
 
         let appPath = workspacePath;
         let detectedType: "DOCKERFILE" | "NODE" | "STATIC" | "PYTHON" | "GO" | null = null;
@@ -82,7 +89,7 @@ export const deployPreview = async (
         } else {
             const templateName = `Dockerfile.${detectedType.toLowerCase()}`;
             const dockerfileToUse = path.resolve("docker", templateName);
-            
+
             if (detectedType === "STATIC") {
                 containerPort = 80;
             }
@@ -98,12 +105,12 @@ export const deployPreview = async (
             // Inject custom commands if configured
             const dockerfilePath = path.join(appPath, "Dockerfile");
             let dockerfileContent = fs.readFileSync(dockerfilePath, "utf-8");
-            
+
             if (repoConfig?.installCommand) {
                 dockerfileContent = dockerfileContent.replace(/RUN npm install/g, `RUN ${repoConfig.installCommand}`);
                 buildLogs.push(`Injected custom install command: ${repoConfig.installCommand}`);
             }
-            
+
             if (repoConfig?.buildCommand) {
                 const lines = dockerfileContent.split("\n");
                 const insertIndex = lines.findIndex(l => l.startsWith("EXPOSE") || l.startsWith("CMD"));
@@ -113,7 +120,7 @@ export const deployPreview = async (
                     buildLogs.push(`Injected custom build command: ${repoConfig.buildCommand}`);
                 }
             }
-            
+
             fs.writeFileSync(dockerfilePath, dockerfileContent);
         }
 
@@ -150,12 +157,16 @@ export const deployPreview = async (
         const previewUrl = `http://localhost:${hostPort}`;
         buildLogs.push(`Preview LIVE at ${previewUrl}`);
 
+        const expiresAt = new Date();
+        expiresAt.setHours(expiresAt.getHours() + 2); // Configurable expiry time, default 2 hours
+
         await updateDeploymentInDb(deploymentId, {
             status: "LIVE",
             previewUrl,
             containerId,
             hostPort,
             buildLogs: buildLogs.join("\n"),
+            expiresAt,
         });
 
         const deploymentRecord = await prisma.deployment.findUnique({
@@ -168,7 +179,7 @@ export const deployPreview = async (
             if (owner && repo) {
                 try {
                     const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN?.trim() });
-                    
+
                     await octokit.issues.createComment({
                         owner,
                         repo,
@@ -256,22 +267,28 @@ export const destroyPreviewsForPullRequest = async (
 
     for (const deployment of activeDeployments) {
         await destroyPreview(deployment.id);
+
+        // Mark old deployments as superseded instead of deleting them
+        await updateDeploymentInDb(deployment.id, {
+            status: "SUPERSEDED"
+        });
     }
 };
 
 export const updateDeploymentInDb = async (
     deploymentId: string,
     data: {
-        status?: "BUILDING" | "DEPLOYING" | "LIVE" | "BUILD_FAILED" | "CLOSED" | "MERGED";
+        status?: "BUILDING" | "DEPLOYING" | "LIVE" | "BUILD_FAILED" | "CLOSED" | "MERGED" | "EXPIRED" | "SUPERSEDED";
         previewUrl?: string;
         containerId?: string;
         hostPort?: number;
         buildLogs?: string;
         errorMessage?: string;
+        expiresAt?: Date | null;
     }
 ) => {
     return prisma.deployment.update({
         where: { id: deploymentId },
-        data,
+        data: data as any,
     });
 };

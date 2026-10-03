@@ -28,10 +28,12 @@ export type AggregateRepository = {
 
 export type RepositoryAvgAggregateOutputType = {
   webhookId: number | null
+  baselinePort: number | null
 }
 
 export type RepositorySumAggregateOutputType = {
   webhookId: number | null
+  baselinePort: number | null
 }
 
 export type RepositoryMinAggregateOutputType = {
@@ -44,6 +46,11 @@ export type RepositoryMinAggregateOutputType = {
   productionUrl: string | null
   webhookId: number | null
   webhookSecret: string | null
+  userId: string | null
+  baselineContainerId: string | null
+  baselinePort: number | null
+  baselineUrl: string | null
+  baselineStatus: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -58,6 +65,11 @@ export type RepositoryMaxAggregateOutputType = {
   productionUrl: string | null
   webhookId: number | null
   webhookSecret: string | null
+  userId: string | null
+  baselineContainerId: string | null
+  baselinePort: number | null
+  baselineUrl: string | null
+  baselineStatus: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -72,6 +84,11 @@ export type RepositoryCountAggregateOutputType = {
   productionUrl: number
   webhookId: number
   webhookSecret: number
+  userId: number
+  baselineContainerId: number
+  baselinePort: number
+  baselineUrl: number
+  baselineStatus: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -80,10 +97,12 @@ export type RepositoryCountAggregateOutputType = {
 
 export type RepositoryAvgAggregateInputType = {
   webhookId?: true
+  baselinePort?: true
 }
 
 export type RepositorySumAggregateInputType = {
   webhookId?: true
+  baselinePort?: true
 }
 
 export type RepositoryMinAggregateInputType = {
@@ -96,6 +115,11 @@ export type RepositoryMinAggregateInputType = {
   productionUrl?: true
   webhookId?: true
   webhookSecret?: true
+  userId?: true
+  baselineContainerId?: true
+  baselinePort?: true
+  baselineUrl?: true
+  baselineStatus?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -110,6 +134,11 @@ export type RepositoryMaxAggregateInputType = {
   productionUrl?: true
   webhookId?: true
   webhookSecret?: true
+  userId?: true
+  baselineContainerId?: true
+  baselinePort?: true
+  baselineUrl?: true
+  baselineStatus?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -124,6 +153,11 @@ export type RepositoryCountAggregateInputType = {
   productionUrl?: true
   webhookId?: true
   webhookSecret?: true
+  userId?: true
+  baselineContainerId?: true
+  baselinePort?: true
+  baselineUrl?: true
+  baselineStatus?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -225,6 +259,11 @@ export type RepositoryGroupByOutputType = {
   productionUrl: string | null
   webhookId: number | null
   webhookSecret: string | null
+  userId: string | null
+  baselineContainerId: string | null
+  baselinePort: number | null
+  baselineUrl: string | null
+  baselineStatus: string | null
   createdAt: Date
   updatedAt: Date
   _count: RepositoryCountAggregateOutputType | null
@@ -262,8 +301,14 @@ export type RepositoryWhereInput = {
   productionUrl?: Prisma.StringNullableFilter<"Repository"> | string | null
   webhookId?: Prisma.IntNullableFilter<"Repository"> | number | null
   webhookSecret?: Prisma.StringNullableFilter<"Repository"> | string | null
+  userId?: Prisma.StringNullableFilter<"Repository"> | string | null
+  baselineContainerId?: Prisma.StringNullableFilter<"Repository"> | string | null
+  baselinePort?: Prisma.IntNullableFilter<"Repository"> | number | null
+  baselineUrl?: Prisma.StringNullableFilter<"Repository"> | string | null
+  baselineStatus?: Prisma.StringNullableFilter<"Repository"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Repository"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Repository"> | Date | string
+  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   pullRequests?: Prisma.PullRequestListRelationFilter
 }
 
@@ -277,8 +322,14 @@ export type RepositoryOrderByWithRelationInput = {
   productionUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   webhookId?: Prisma.SortOrderInput | Prisma.SortOrder
   webhookSecret?: Prisma.SortOrderInput | Prisma.SortOrder
+  userId?: Prisma.SortOrderInput | Prisma.SortOrder
+  baselineContainerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  baselinePort?: Prisma.SortOrderInput | Prisma.SortOrder
+  baselineUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  baselineStatus?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  user?: Prisma.UserOrderByWithRelationInput
   pullRequests?: Prisma.PullRequestOrderByRelationAggregateInput
 }
 
@@ -295,8 +346,14 @@ export type RepositoryWhereUniqueInput = Prisma.AtLeast<{
   productionUrl?: Prisma.StringNullableFilter<"Repository"> | string | null
   webhookId?: Prisma.IntNullableFilter<"Repository"> | number | null
   webhookSecret?: Prisma.StringNullableFilter<"Repository"> | string | null
+  userId?: Prisma.StringNullableFilter<"Repository"> | string | null
+  baselineContainerId?: Prisma.StringNullableFilter<"Repository"> | string | null
+  baselinePort?: Prisma.IntNullableFilter<"Repository"> | number | null
+  baselineUrl?: Prisma.StringNullableFilter<"Repository"> | string | null
+  baselineStatus?: Prisma.StringNullableFilter<"Repository"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Repository"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Repository"> | Date | string
+  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   pullRequests?: Prisma.PullRequestListRelationFilter
 }, "id" | "fullName">
 
@@ -310,6 +367,11 @@ export type RepositoryOrderByWithAggregationInput = {
   productionUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   webhookId?: Prisma.SortOrderInput | Prisma.SortOrder
   webhookSecret?: Prisma.SortOrderInput | Prisma.SortOrder
+  userId?: Prisma.SortOrderInput | Prisma.SortOrder
+  baselineContainerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  baselinePort?: Prisma.SortOrderInput | Prisma.SortOrder
+  baselineUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  baselineStatus?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.RepositoryCountOrderByAggregateInput
@@ -332,6 +394,11 @@ export type RepositoryScalarWhereWithAggregatesInput = {
   productionUrl?: Prisma.StringNullableWithAggregatesFilter<"Repository"> | string | null
   webhookId?: Prisma.IntNullableWithAggregatesFilter<"Repository"> | number | null
   webhookSecret?: Prisma.StringNullableWithAggregatesFilter<"Repository"> | string | null
+  userId?: Prisma.StringNullableWithAggregatesFilter<"Repository"> | string | null
+  baselineContainerId?: Prisma.StringNullableWithAggregatesFilter<"Repository"> | string | null
+  baselinePort?: Prisma.IntNullableWithAggregatesFilter<"Repository"> | number | null
+  baselineUrl?: Prisma.StringNullableWithAggregatesFilter<"Repository"> | string | null
+  baselineStatus?: Prisma.StringNullableWithAggregatesFilter<"Repository"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Repository"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Repository"> | Date | string
 }
@@ -346,8 +413,13 @@ export type RepositoryCreateInput = {
   productionUrl?: string | null
   webhookId?: number | null
   webhookSecret?: string | null
+  baselineContainerId?: string | null
+  baselinePort?: number | null
+  baselineUrl?: string | null
+  baselineStatus?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  user?: Prisma.UserCreateNestedOneWithoutRepositoriesInput
   pullRequests?: Prisma.PullRequestCreateNestedManyWithoutRepositoryInput
 }
 
@@ -361,6 +433,11 @@ export type RepositoryUncheckedCreateInput = {
   productionUrl?: string | null
   webhookId?: number | null
   webhookSecret?: string | null
+  userId?: string | null
+  baselineContainerId?: string | null
+  baselinePort?: number | null
+  baselineUrl?: string | null
+  baselineStatus?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutRepositoryInput
@@ -376,8 +453,13 @@ export type RepositoryUpdateInput = {
   productionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   webhookSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselineContainerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselinePort?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  baselineUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselineStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneWithoutRepositoriesNestedInput
   pullRequests?: Prisma.PullRequestUpdateManyWithoutRepositoryNestedInput
 }
 
@@ -391,6 +473,11 @@ export type RepositoryUncheckedUpdateInput = {
   productionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   webhookSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselineContainerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselinePort?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  baselineUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselineStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutRepositoryNestedInput
@@ -406,6 +493,11 @@ export type RepositoryCreateManyInput = {
   productionUrl?: string | null
   webhookId?: number | null
   webhookSecret?: string | null
+  userId?: string | null
+  baselineContainerId?: string | null
+  baselinePort?: number | null
+  baselineUrl?: string | null
+  baselineStatus?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -420,6 +512,10 @@ export type RepositoryUpdateManyMutationInput = {
   productionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   webhookSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselineContainerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselinePort?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  baselineUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselineStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -434,6 +530,11 @@ export type RepositoryUncheckedUpdateManyInput = {
   productionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   webhookSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselineContainerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselinePort?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  baselineUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselineStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -448,12 +549,18 @@ export type RepositoryCountOrderByAggregateInput = {
   productionUrl?: Prisma.SortOrder
   webhookId?: Prisma.SortOrder
   webhookSecret?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  baselineContainerId?: Prisma.SortOrder
+  baselinePort?: Prisma.SortOrder
+  baselineUrl?: Prisma.SortOrder
+  baselineStatus?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type RepositoryAvgOrderByAggregateInput = {
   webhookId?: Prisma.SortOrder
+  baselinePort?: Prisma.SortOrder
 }
 
 export type RepositoryMaxOrderByAggregateInput = {
@@ -466,6 +573,11 @@ export type RepositoryMaxOrderByAggregateInput = {
   productionUrl?: Prisma.SortOrder
   webhookId?: Prisma.SortOrder
   webhookSecret?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  baselineContainerId?: Prisma.SortOrder
+  baselinePort?: Prisma.SortOrder
+  baselineUrl?: Prisma.SortOrder
+  baselineStatus?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -480,12 +592,28 @@ export type RepositoryMinOrderByAggregateInput = {
   productionUrl?: Prisma.SortOrder
   webhookId?: Prisma.SortOrder
   webhookSecret?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
+  baselineContainerId?: Prisma.SortOrder
+  baselinePort?: Prisma.SortOrder
+  baselineUrl?: Prisma.SortOrder
+  baselineStatus?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type RepositorySumOrderByAggregateInput = {
   webhookId?: Prisma.SortOrder
+  baselinePort?: Prisma.SortOrder
+}
+
+export type RepositoryListRelationFilter = {
+  every?: Prisma.RepositoryWhereInput
+  some?: Prisma.RepositoryWhereInput
+  none?: Prisma.RepositoryWhereInput
+}
+
+export type RepositoryOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type RepositoryScalarRelationFilter = {
@@ -513,6 +641,48 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type RepositoryCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.RepositoryCreateWithoutUserInput, Prisma.RepositoryUncheckedCreateWithoutUserInput> | Prisma.RepositoryCreateWithoutUserInput[] | Prisma.RepositoryUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.RepositoryCreateOrConnectWithoutUserInput | Prisma.RepositoryCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.RepositoryCreateManyUserInputEnvelope
+  connect?: Prisma.RepositoryWhereUniqueInput | Prisma.RepositoryWhereUniqueInput[]
+}
+
+export type RepositoryUncheckedCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.RepositoryCreateWithoutUserInput, Prisma.RepositoryUncheckedCreateWithoutUserInput> | Prisma.RepositoryCreateWithoutUserInput[] | Prisma.RepositoryUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.RepositoryCreateOrConnectWithoutUserInput | Prisma.RepositoryCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.RepositoryCreateManyUserInputEnvelope
+  connect?: Prisma.RepositoryWhereUniqueInput | Prisma.RepositoryWhereUniqueInput[]
+}
+
+export type RepositoryUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.RepositoryCreateWithoutUserInput, Prisma.RepositoryUncheckedCreateWithoutUserInput> | Prisma.RepositoryCreateWithoutUserInput[] | Prisma.RepositoryUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.RepositoryCreateOrConnectWithoutUserInput | Prisma.RepositoryCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.RepositoryUpsertWithWhereUniqueWithoutUserInput | Prisma.RepositoryUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.RepositoryCreateManyUserInputEnvelope
+  set?: Prisma.RepositoryWhereUniqueInput | Prisma.RepositoryWhereUniqueInput[]
+  disconnect?: Prisma.RepositoryWhereUniqueInput | Prisma.RepositoryWhereUniqueInput[]
+  delete?: Prisma.RepositoryWhereUniqueInput | Prisma.RepositoryWhereUniqueInput[]
+  connect?: Prisma.RepositoryWhereUniqueInput | Prisma.RepositoryWhereUniqueInput[]
+  update?: Prisma.RepositoryUpdateWithWhereUniqueWithoutUserInput | Prisma.RepositoryUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.RepositoryUpdateManyWithWhereWithoutUserInput | Prisma.RepositoryUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.RepositoryScalarWhereInput | Prisma.RepositoryScalarWhereInput[]
+}
+
+export type RepositoryUncheckedUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.RepositoryCreateWithoutUserInput, Prisma.RepositoryUncheckedCreateWithoutUserInput> | Prisma.RepositoryCreateWithoutUserInput[] | Prisma.RepositoryUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.RepositoryCreateOrConnectWithoutUserInput | Prisma.RepositoryCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.RepositoryUpsertWithWhereUniqueWithoutUserInput | Prisma.RepositoryUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.RepositoryCreateManyUserInputEnvelope
+  set?: Prisma.RepositoryWhereUniqueInput | Prisma.RepositoryWhereUniqueInput[]
+  disconnect?: Prisma.RepositoryWhereUniqueInput | Prisma.RepositoryWhereUniqueInput[]
+  delete?: Prisma.RepositoryWhereUniqueInput | Prisma.RepositoryWhereUniqueInput[]
+  connect?: Prisma.RepositoryWhereUniqueInput | Prisma.RepositoryWhereUniqueInput[]
+  update?: Prisma.RepositoryUpdateWithWhereUniqueWithoutUserInput | Prisma.RepositoryUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.RepositoryUpdateManyWithWhereWithoutUserInput | Prisma.RepositoryUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.RepositoryScalarWhereInput | Prisma.RepositoryScalarWhereInput[]
+}
+
 export type RepositoryCreateNestedOneWithoutPullRequestsInput = {
   create?: Prisma.XOR<Prisma.RepositoryCreateWithoutPullRequestsInput, Prisma.RepositoryUncheckedCreateWithoutPullRequestsInput>
   connectOrCreate?: Prisma.RepositoryCreateOrConnectWithoutPullRequestsInput
@@ -527,6 +697,92 @@ export type RepositoryUpdateOneRequiredWithoutPullRequestsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.RepositoryUpdateToOneWithWhereWithoutPullRequestsInput, Prisma.RepositoryUpdateWithoutPullRequestsInput>, Prisma.RepositoryUncheckedUpdateWithoutPullRequestsInput>
 }
 
+export type RepositoryCreateWithoutUserInput = {
+  id?: string
+  fullName: string
+  defaultBranch?: string
+  appDirectory?: string | null
+  buildCommand?: string | null
+  installCommand?: string | null
+  productionUrl?: string | null
+  webhookId?: number | null
+  webhookSecret?: string | null
+  baselineContainerId?: string | null
+  baselinePort?: number | null
+  baselineUrl?: string | null
+  baselineStatus?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutRepositoryInput
+}
+
+export type RepositoryUncheckedCreateWithoutUserInput = {
+  id?: string
+  fullName: string
+  defaultBranch?: string
+  appDirectory?: string | null
+  buildCommand?: string | null
+  installCommand?: string | null
+  productionUrl?: string | null
+  webhookId?: number | null
+  webhookSecret?: string | null
+  baselineContainerId?: string | null
+  baselinePort?: number | null
+  baselineUrl?: string | null
+  baselineStatus?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutRepositoryInput
+}
+
+export type RepositoryCreateOrConnectWithoutUserInput = {
+  where: Prisma.RepositoryWhereUniqueInput
+  create: Prisma.XOR<Prisma.RepositoryCreateWithoutUserInput, Prisma.RepositoryUncheckedCreateWithoutUserInput>
+}
+
+export type RepositoryCreateManyUserInputEnvelope = {
+  data: Prisma.RepositoryCreateManyUserInput | Prisma.RepositoryCreateManyUserInput[]
+  skipDuplicates?: boolean
+}
+
+export type RepositoryUpsertWithWhereUniqueWithoutUserInput = {
+  where: Prisma.RepositoryWhereUniqueInput
+  update: Prisma.XOR<Prisma.RepositoryUpdateWithoutUserInput, Prisma.RepositoryUncheckedUpdateWithoutUserInput>
+  create: Prisma.XOR<Prisma.RepositoryCreateWithoutUserInput, Prisma.RepositoryUncheckedCreateWithoutUserInput>
+}
+
+export type RepositoryUpdateWithWhereUniqueWithoutUserInput = {
+  where: Prisma.RepositoryWhereUniqueInput
+  data: Prisma.XOR<Prisma.RepositoryUpdateWithoutUserInput, Prisma.RepositoryUncheckedUpdateWithoutUserInput>
+}
+
+export type RepositoryUpdateManyWithWhereWithoutUserInput = {
+  where: Prisma.RepositoryScalarWhereInput
+  data: Prisma.XOR<Prisma.RepositoryUpdateManyMutationInput, Prisma.RepositoryUncheckedUpdateManyWithoutUserInput>
+}
+
+export type RepositoryScalarWhereInput = {
+  AND?: Prisma.RepositoryScalarWhereInput | Prisma.RepositoryScalarWhereInput[]
+  OR?: Prisma.RepositoryScalarWhereInput[]
+  NOT?: Prisma.RepositoryScalarWhereInput | Prisma.RepositoryScalarWhereInput[]
+  id?: Prisma.StringFilter<"Repository"> | string
+  fullName?: Prisma.StringFilter<"Repository"> | string
+  defaultBranch?: Prisma.StringFilter<"Repository"> | string
+  appDirectory?: Prisma.StringNullableFilter<"Repository"> | string | null
+  buildCommand?: Prisma.StringNullableFilter<"Repository"> | string | null
+  installCommand?: Prisma.StringNullableFilter<"Repository"> | string | null
+  productionUrl?: Prisma.StringNullableFilter<"Repository"> | string | null
+  webhookId?: Prisma.IntNullableFilter<"Repository"> | number | null
+  webhookSecret?: Prisma.StringNullableFilter<"Repository"> | string | null
+  userId?: Prisma.StringNullableFilter<"Repository"> | string | null
+  baselineContainerId?: Prisma.StringNullableFilter<"Repository"> | string | null
+  baselinePort?: Prisma.IntNullableFilter<"Repository"> | number | null
+  baselineUrl?: Prisma.StringNullableFilter<"Repository"> | string | null
+  baselineStatus?: Prisma.StringNullableFilter<"Repository"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Repository"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Repository"> | Date | string
+}
+
 export type RepositoryCreateWithoutPullRequestsInput = {
   id?: string
   fullName: string
@@ -537,8 +793,13 @@ export type RepositoryCreateWithoutPullRequestsInput = {
   productionUrl?: string | null
   webhookId?: number | null
   webhookSecret?: string | null
+  baselineContainerId?: string | null
+  baselinePort?: number | null
+  baselineUrl?: string | null
+  baselineStatus?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  user?: Prisma.UserCreateNestedOneWithoutRepositoriesInput
 }
 
 export type RepositoryUncheckedCreateWithoutPullRequestsInput = {
@@ -551,6 +812,11 @@ export type RepositoryUncheckedCreateWithoutPullRequestsInput = {
   productionUrl?: string | null
   webhookId?: number | null
   webhookSecret?: string | null
+  userId?: string | null
+  baselineContainerId?: string | null
+  baselinePort?: number | null
+  baselineUrl?: string | null
+  baselineStatus?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -581,8 +847,13 @@ export type RepositoryUpdateWithoutPullRequestsInput = {
   productionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   webhookSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselineContainerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselinePort?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  baselineUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselineStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneWithoutRepositoriesNestedInput
 }
 
 export type RepositoryUncheckedUpdateWithoutPullRequestsInput = {
@@ -595,6 +866,85 @@ export type RepositoryUncheckedUpdateWithoutPullRequestsInput = {
   productionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   webhookSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselineContainerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselinePort?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  baselineUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselineStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type RepositoryCreateManyUserInput = {
+  id?: string
+  fullName: string
+  defaultBranch?: string
+  appDirectory?: string | null
+  buildCommand?: string | null
+  installCommand?: string | null
+  productionUrl?: string | null
+  webhookId?: number | null
+  webhookSecret?: string | null
+  baselineContainerId?: string | null
+  baselinePort?: number | null
+  baselineUrl?: string | null
+  baselineStatus?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type RepositoryUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultBranch?: Prisma.StringFieldUpdateOperationsInput | string
+  appDirectory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buildCommand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  installCommand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  webhookId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  webhookSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselineContainerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselinePort?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  baselineUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselineStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutRepositoryNestedInput
+}
+
+export type RepositoryUncheckedUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultBranch?: Prisma.StringFieldUpdateOperationsInput | string
+  appDirectory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buildCommand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  installCommand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  webhookId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  webhookSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselineContainerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselinePort?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  baselineUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselineStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutRepositoryNestedInput
+}
+
+export type RepositoryUncheckedUpdateManyWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultBranch?: Prisma.StringFieldUpdateOperationsInput | string
+  appDirectory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buildCommand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  installCommand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  webhookId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  webhookSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselineContainerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselinePort?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  baselineUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselineStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -640,8 +990,14 @@ export type RepositorySelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   productionUrl?: boolean
   webhookId?: boolean
   webhookSecret?: boolean
+  userId?: boolean
+  baselineContainerId?: boolean
+  baselinePort?: boolean
+  baselineUrl?: boolean
+  baselineStatus?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  user?: boolean | Prisma.Repository$userArgs<ExtArgs>
   pullRequests?: boolean | Prisma.Repository$pullRequestsArgs<ExtArgs>
   _count?: boolean | Prisma.RepositoryCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["repository"]>
@@ -656,8 +1012,14 @@ export type RepositorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   productionUrl?: boolean
   webhookId?: boolean
   webhookSecret?: boolean
+  userId?: boolean
+  baselineContainerId?: boolean
+  baselinePort?: boolean
+  baselineUrl?: boolean
+  baselineStatus?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  user?: boolean | Prisma.Repository$userArgs<ExtArgs>
 }, ExtArgs["result"]["repository"]>
 
 export type RepositorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -670,8 +1032,14 @@ export type RepositorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   productionUrl?: boolean
   webhookId?: boolean
   webhookSecret?: boolean
+  userId?: boolean
+  baselineContainerId?: boolean
+  baselinePort?: boolean
+  baselineUrl?: boolean
+  baselineStatus?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  user?: boolean | Prisma.Repository$userArgs<ExtArgs>
 }, ExtArgs["result"]["repository"]>
 
 export type RepositorySelectScalar = {
@@ -684,21 +1052,32 @@ export type RepositorySelectScalar = {
   productionUrl?: boolean
   webhookId?: boolean
   webhookSecret?: boolean
+  userId?: boolean
+  baselineContainerId?: boolean
+  baselinePort?: boolean
+  baselineUrl?: boolean
+  baselineStatus?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type RepositoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "defaultBranch" | "appDirectory" | "buildCommand" | "installCommand" | "productionUrl" | "webhookId" | "webhookSecret" | "createdAt" | "updatedAt", ExtArgs["result"]["repository"]>
+export type RepositoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "defaultBranch" | "appDirectory" | "buildCommand" | "installCommand" | "productionUrl" | "webhookId" | "webhookSecret" | "userId" | "baselineContainerId" | "baselinePort" | "baselineUrl" | "baselineStatus" | "createdAt" | "updatedAt", ExtArgs["result"]["repository"]>
 export type RepositoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.Repository$userArgs<ExtArgs>
   pullRequests?: boolean | Prisma.Repository$pullRequestsArgs<ExtArgs>
   _count?: boolean | Prisma.RepositoryCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type RepositoryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type RepositoryIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type RepositoryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.Repository$userArgs<ExtArgs>
+}
+export type RepositoryIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.Repository$userArgs<ExtArgs>
+}
 
 export type $RepositoryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Repository"
   objects: {
+    user: Prisma.$UserPayload<ExtArgs> | null
     pullRequests: Prisma.$PullRequestPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -711,6 +1090,11 @@ export type $RepositoryPayload<ExtArgs extends runtime.Types.Extensions.Internal
     productionUrl: string | null
     webhookId: number | null
     webhookSecret: string | null
+    userId: string | null
+    baselineContainerId: string | null
+    baselinePort: number | null
+    baselineUrl: string | null
+    baselineStatus: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["repository"]>
@@ -1107,6 +1491,7 @@ readonly fields: RepositoryFieldRefs;
  */
 export interface Prisma__RepositoryClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  user<T extends Prisma.Repository$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Repository$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   pullRequests<T extends Prisma.Repository$pullRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Repository$pullRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PullRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1146,6 +1531,11 @@ export interface RepositoryFieldRefs {
   readonly productionUrl: Prisma.FieldRef<"Repository", 'String'>
   readonly webhookId: Prisma.FieldRef<"Repository", 'Int'>
   readonly webhookSecret: Prisma.FieldRef<"Repository", 'String'>
+  readonly userId: Prisma.FieldRef<"Repository", 'String'>
+  readonly baselineContainerId: Prisma.FieldRef<"Repository", 'String'>
+  readonly baselinePort: Prisma.FieldRef<"Repository", 'Int'>
+  readonly baselineUrl: Prisma.FieldRef<"Repository", 'String'>
+  readonly baselineStatus: Prisma.FieldRef<"Repository", 'String'>
   readonly createdAt: Prisma.FieldRef<"Repository", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Repository", 'DateTime'>
 }
@@ -1402,6 +1792,10 @@ export type RepositoryCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Exte
    */
   data: Prisma.RepositoryCreateManyInput | Prisma.RepositoryCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RepositoryIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1472,6 +1866,10 @@ export type RepositoryUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Exte
    * Limit how many Repositories to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RepositoryIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1538,6 +1936,25 @@ export type RepositoryDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * Limit how many Repositories to delete.
    */
   limit?: number
+}
+
+/**
+ * Repository.user
+ */
+export type Repository$userArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**

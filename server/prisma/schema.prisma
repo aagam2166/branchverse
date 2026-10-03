@@ -8,18 +8,36 @@ datasource db {
 }
 
 model Repository {
-  id             String        @id @default(uuid())
-  fullName       String        @unique
-  defaultBranch  String        @default("main")
-  appDirectory   String?       @default(".")
-  buildCommand   String?
-  installCommand String?
-  productionUrl  String?
-  webhookId      Int?
-  webhookSecret  String?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  pullRequests   PullRequest[]
+  id                  String        @id @default(uuid())
+  fullName            String        @unique
+  defaultBranch       String        @default("main")
+  appDirectory        String?       @default(".")
+  buildCommand        String?
+  installCommand      String?
+  productionUrl       String?
+  webhookId           Int?
+  webhookSecret       String?
+  userId              String?
+  user                User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  baselineContainerId String?
+  baselinePort        Int?
+  baselineUrl         String?
+  baselineStatus      String?       @default("NONE")
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  pullRequests        PullRequest[]
+}
+
+model User {
+  id           String       @id @default(uuid())
+  githubId     String       @unique
+  username     String
+  email        String?
+  avatarUrl    String?
+  accessToken  String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  repositories Repository[]
 }
 
 model PullRequest {
@@ -51,6 +69,7 @@ model Deployment {
   hostPort      Int?
   buildLogs     String?
   errorMessage  String?
+  expiresAt     DateTime?
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
   pullRequest   PullRequest      @relation(fields: [pullRequestId], references: [id], onDelete: Cascade)
@@ -65,6 +84,8 @@ enum DeploymentStatus {
   BUILD_FAILED
   CLOSED
   MERGED
+  EXPIRED
+  SUPERSEDED
 }
 
 enum PullRequestState {

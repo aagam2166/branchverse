@@ -2,10 +2,10 @@ import crypto from "crypto";
 import { Octokit } from "@octokit/rest";
 import { prisma } from "../lib/prisma.js";
 
-const getOctokit = () => {
-    const token = process.env.GITHUB_TOKEN?.trim();
+const getOctokit = (customToken?: string) => {
+    const token = customToken?.trim() || process.env.GITHUB_TOKEN?.trim();
     if (!token) {
-        throw new Error("GITHUB_TOKEN is missing in environment variables (.env)");
+        throw new Error("No GitHub token provided and GITHUB_TOKEN is missing in environment variables (.env)");
     }
     return new Octokit({ auth: token });
 };
@@ -15,7 +15,9 @@ export const connectRepository = async (
     appDirectory?: string,
     buildCommand?: string,
     installCommand?: string,
-    productionUrl?: string
+    productionUrl?: string,
+    userId?: string,
+    userToken?: string
 ) => {
     const [owner, repo] = repositoryFullName.split("/");
     if (!owner || !repo) {
@@ -27,7 +29,7 @@ export const connectRepository = async (
         throw new Error("PUBLIC_URL is not set in environment variables");
     }
 
-    const octokit = getOctokit();
+    const octokit = getOctokit(userToken);
     
     // Auto-fetch production URL from GitHub if not provided
     if (!productionUrl) {
@@ -75,8 +77,8 @@ export const connectRepository = async (
         }
     }
 
-    // Upsert repository in DB with webhook info
-    const repository = await prisma.repository.upsert({
+    // Upsert repository in DB with webhook info & userId
+    const repository = await (prisma as any).repository.upsert({
         where: { fullName: repositoryFullName },
         update: {
             appDirectory: appDirectory ?? null,
@@ -85,6 +87,7 @@ export const connectRepository = async (
             productionUrl: productionUrl ?? null,
             webhookSecret,
             webhookId: hookId,
+            userId: userId ?? undefined,
         },
         create: {
             fullName: repositoryFullName,
@@ -94,6 +97,7 @@ export const connectRepository = async (
             productionUrl: productionUrl ?? null,
             webhookSecret,
             webhookId: hookId,
+            userId: userId ?? null,
         },
     });
 
@@ -137,8 +141,9 @@ export const disconnectRepository = async (repositoryId: string) => {
     await prisma.repository.delete({ where: { id: repositoryId } });
 };
 
-export const listRepositories = async () => {
+export const listRepositories = async (userId?: string) => {
     return prisma.repository.findMany({
+        ...(userId ? { where: { userId } } : {}),
         include: {
             pullRequests: {
                 orderBy: { updatedAt: "desc" },

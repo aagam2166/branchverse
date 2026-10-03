@@ -2,7 +2,14 @@ import { useState, useEffect } from "react";
 import { FolderGit2, X, Plus, Trash2, Copy, Check, Terminal, ExternalLink } from "lucide-react";
 import { Button } from "../ui/button.js";
 import { Input } from "../ui/input.js";
-import { fetchRepositories, connectRepository, deleteRepository, inspectRepository } from "../../services/api.js";
+import { 
+  fetchRepositories, 
+  connectRepository, 
+  deleteRepository, 
+  inspectRepository,
+  fetchUserGitHubRepos,
+  type UserGitHubRepo 
+} from "../../services/api.js";
 import type { Repository } from "../../types/index.js";
 
 interface ConnectRepoModalProps {
@@ -13,6 +20,7 @@ interface ConnectRepoModalProps {
 
 export function ConnectRepoModal({ isOpen, onClose, onRepoUpdated }: ConnectRepoModalProps) {
   const [repositories, setRepositories] = useState<Repository[]>([]);
+  const [userGitHubRepos, setUserGitHubRepos] = useState<UserGitHubRepo[]>([]);
   const [fullName, setFullName] = useState("");
   const [appDirectory, setAppDirectory] = useState("");
   const [installCommand, setInstallCommand] = useState("");
@@ -40,9 +48,20 @@ export function ConnectRepoModal({ isOpen, onClose, onRepoUpdated }: ConnectRepo
     }
   };
 
+  const loadUserGitHubRepos = async () => {
+    try {
+      const repos = await fetchUserGitHubRepos();
+      setUserGitHubRepos(repos);
+    } catch (err) {
+      // User might not be logged in or token expired
+      setUserGitHubRepos([]);
+    }
+  };
+
   useEffect(() => {
     if (isOpen) {
       loadRepos();
+      loadUserGitHubRepos();
       setError(null);
       setWarning(null);
       setDetectedStack(null);
@@ -159,6 +178,22 @@ export function ConnectRepoModal({ isOpen, onClose, onRepoUpdated }: ConnectRepo
               <label className="block text-xs font-semibold text-slate-300 mb-1.5">
                 Repository Full Name
               </label>
+
+              {userGitHubRepos.length > 0 && (
+                <select
+                  onChange={(e) => setFullName(e.target.value)}
+                  value={fullName}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs font-mono text-cyan-300 mb-2 focus:outline-none focus:border-cyan-500"
+                >
+                  <option value="">-- Select from your GitHub Repositories --</option>
+                  {userGitHubRepos.map((r) => (
+                    <option key={r.id} value={r.fullName}>
+                      {r.fullName} {r.private ? "🔒 (Private)" : "🌐 (Public)"}
+                    </option>
+                  ))}
+                </select>
+              )}
+
               <Input
                 type="text"
                 placeholder="e.g. octocat/hello-world"
