@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { FolderGit2, X, Plus, Trash2, Copy, Check, Terminal, ExternalLink } from "lucide-react";
 import { Button } from "../ui/button.js";
 import { Input } from "../ui/input.js";
-import { fetchRepositories, connectRepository, deleteRepository } from "../../services/api.js";
+import { fetchRepositories, connectRepository, deleteRepository, inspectRepository } from "../../services/api.js";
 import type { Repository } from "../../types/index.js";
 
 interface ConnectRepoModalProps {
@@ -15,11 +15,17 @@ export function ConnectRepoModal({ isOpen, onClose, onRepoUpdated }: ConnectRepo
   const [repositories, setRepositories] = useState<Repository[]>([]);
   const [fullName, setFullName] = useState("");
   const [appDirectory, setAppDirectory] = useState("");
+  const [installCommand, setInstallCommand] = useState("");
+  const [buildCommand, setBuildCommand] = useState("");
+  const [productionUrl, setProductionUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [warning, setWarning] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [serverWebhookUrl, setServerWebhookUrl] = useState<string>("");
+  
+  const [inspecting, setInspecting] = useState(false);
+  const [detectedStack, setDetectedStack] = useState<{ type: string | null; path: string } | null>(null);
 
   const webhookUrl = serverWebhookUrl || (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
     ? "https://stiffness-clamshell-unable.ngrok-free.dev/api/webhooks/github"
@@ -39,8 +45,23 @@ export function ConnectRepoModal({ isOpen, onClose, onRepoUpdated }: ConnectRepo
       loadRepos();
       setError(null);
       setWarning(null);
+      setDetectedStack(null);
     }
   }, [isOpen]);
+
+  const handleInspect = async () => {
+    if (!fullName || !fullName.includes("/")) return;
+    try {
+      setInspecting(true);
+      setError(null);
+      const res = await inspectRepository(fullName.trim(), appDirectory.trim() || undefined);
+      setDetectedStack(res);
+    } catch (err: any) {
+      setDetectedStack({ type: null, path: appDirectory || "root" });
+    } finally {
+      setInspecting(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -61,7 +82,13 @@ export function ConnectRepoModal({ isOpen, onClose, onRepoUpdated }: ConnectRepo
       setLoading(true);
       setError(null);
       setWarning(null);
-      const res = await connectRepository(cleanName, appDirectory.trim() || undefined);
+      const res = await connectRepository(
+        cleanName,
+        appDirectory.trim() || undefined,
+        buildCommand.trim() || undefined,
+        installCommand.trim() || undefined,
+        productionUrl.trim() || undefined
+      );
       if (res.warning) {
         setWarning(res.warning);
       }
@@ -70,6 +97,10 @@ export function ConnectRepoModal({ isOpen, onClose, onRepoUpdated }: ConnectRepo
       }
       setFullName("");
       setAppDirectory("");
+      setInstallCommand("");
+      setBuildCommand("");
+      setProductionUrl("");
+      setDetectedStack(null);
       await loadRepos();
       onRepoUpdated();
     } catch (err: unknown) {
@@ -139,15 +170,80 @@ export function ConnectRepoModal({ isOpen, onClose, onRepoUpdated }: ConnectRepo
 
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                App Directory <span className="text-slate-500 font-normal">(Optional, e.g. "frontend" for monorepos)</span>
+                Production URL <span className="text-slate-500 font-normal">(Optional, for Timeline Comparison)</span>
               </label>
+              <Input
+                type="text"
+                placeholder="e.g. https://my-main-website.com"
+                value={productionUrl}
+                onChange={(e) => setProductionUrl(e.target.value)}
+                className="bg-slate-950 border-slate-800 font-mono text-xs"
+              />
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-semibold text-slate-300">
+                  App Directory <span className="text-slate-500 font-normal">(Optional)</span>
+                </label>
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={handleInspect}
+                  disabled={inspecting || !fullName}
+                  className="h-6 px-2 text-[10px] text-cyan-400 cursor-pointer"
+                >
+                  {inspecting ? "Detecting..." : "Auto-detect Stack"}
+                </Button>
+              </div>
               <Input
                 type="text"
                 placeholder="Leave blank for repo root, or specify e.g. frontend"
                 value={appDirectory}
-                onChange={(e) => setAppDirectory(e.target.value)}
-                className="bg-slate-950 border-slate-800 font-mono text-xs"
+                onChange={(e) => {
+                    setAppDirectory(e.target.value);
+                    setDetectedStack(null);
+                }}
+                className="bg-slate-950 border-slate-800 font-mono text-xs mb-2"
               />
+              {detectedStack && (
+                <div className="rounded-lg bg-slate-900/80 p-2 border border-slate-800/80 text-xs">
+                  {detectedStack.type ? (
+                    <span className="text-cyan-300">✓ Detected: {detectedStack.type} in /{detectedStack.path}</span>
+                  ) : (
+                    <span className="text-amber-400">⚠️ Unable to detect application type. Please ensure a valid app directory or configure a Dockerfile.</span>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  Install Command <span className="text-slate-500 font-normal">(Optional)</span>
+                </label>
+                <Input
+                  type="text"
+                  placeholder="e.g. npm install"
+                  value={installCommand}
+                  onChange={(e) => setInstallCommand(e.target.value)}
+                  className="bg-slate-950 border-slate-800 font-mono text-xs"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  Build Command <span className="text-slate-500 font-normal">(Optional)</span>
+                </label>
+                <Input
+                  type="text"
+                  placeholder="e.g. npm run build"
+                  value={buildCommand}
+                  onChange={(e) => setBuildCommand(e.target.value)}
+                  className="bg-slate-950 border-slate-800 font-mono text-xs"
+                />
+              </div>
             </div>
 
             {error && (

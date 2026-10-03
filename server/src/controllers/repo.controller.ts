@@ -3,18 +3,25 @@ import {
     connectRepository,
     disconnectRepository,
     listRepositories,
+    inspectRepository,
 } from "../services/repo.service.js";
 
 export const connectRepo = async (req: Request, res: Response) => {
     try {
-        const { repositoryFullName, appDirectory } = req.body;
+        const { repositoryFullName, appDirectory, buildCommand, installCommand, productionUrl } = req.body;
 
         if (!repositoryFullName || typeof repositoryFullName !== "string") {
             res.status(400).json({ error: "repositoryFullName is required" });
             return;
         }
 
-        const result = await connectRepository(repositoryFullName, appDirectory);
+        const result = await connectRepository(
+            repositoryFullName, 
+            appDirectory, 
+            buildCommand, 
+            installCommand,
+            productionUrl
+        );
 
         res.status(201).json({
             message: `Repository ${repositoryFullName} connected successfully`,
@@ -48,5 +55,23 @@ export const getRepositories = async (_req: Request, res: Response) => {
     } catch (error) {
         console.error("Failed to list repositories:", error);
         res.status(500).json({ error: "Failed to fetch repositories" });
+    }
+};
+
+export const inspectRepo = async (req: Request, res: Response) => {
+    try {
+        const { repositoryFullName, appDirectory } = req.body;
+
+        if (!repositoryFullName || typeof repositoryFullName !== "string") {
+            res.status(400).json({ error: "repositoryFullName is required" });
+            return;
+        }
+
+        const result = await inspectRepository(repositoryFullName, appDirectory);
+        res.json(result);
+    } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        console.error("Failed to inspect repository:", error);
+        res.status(500).json({ error: message });
     }
 };

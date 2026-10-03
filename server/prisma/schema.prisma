@@ -7,6 +7,57 @@ datasource db {
   provider = "postgresql"
 }
 
+model Repository {
+  id             String        @id @default(uuid())
+  fullName       String        @unique
+  defaultBranch  String        @default("main")
+  appDirectory   String?       @default(".")
+  buildCommand   String?
+  installCommand String?
+  productionUrl  String?
+  webhookId      Int?
+  webhookSecret  String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  pullRequests   PullRequest[]
+}
+
+model PullRequest {
+  id              String           @id @default(uuid())
+  repositoryId    String
+  number          Int
+  title           String
+  author          String
+  branch          String
+  latestCommitSha String
+  state           PullRequestState @default(OPEN)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  closedAt        DateTime?
+  deployments     Deployment[]
+  repository      Repository       @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+
+  @@unique([repositoryId, number])
+  @@index([repositoryId])
+}
+
+model Deployment {
+  id            String           @id @default(uuid())
+  pullRequestId String
+  commitSha     String
+  status        DeploymentStatus @default(BUILDING)
+  previewUrl    String?
+  containerId   String?
+  hostPort      Int?
+  buildLogs     String?
+  errorMessage  String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  pullRequest   PullRequest      @relation(fields: [pullRequestId], references: [id], onDelete: Cascade)
+
+  @@index([pullRequestId, createdAt])
+}
+
 enum DeploymentStatus {
   BUILDING
   DEPLOYING
@@ -20,55 +71,4 @@ enum PullRequestState {
   OPEN
   CLOSED
   MERGED
-}
-
-model Repository {
-  id            String        @id @default(uuid())
-  fullName      String        @unique
-  defaultBranch String        @default("main")
-  appDirectory  String?
-  webhookSecret String?
-  webhookId     Int?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-
-  pullRequests  PullRequest[]
-}
-
-model PullRequest {
-  id              String            @id @default(uuid())
-  repositoryId    String
-  number          Int
-  title           String
-  author          String
-  branch          String
-  latestCommitSha String
-  state           PullRequestState  @default(OPEN)
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  closedAt        DateTime?
-
-  repository      Repository        @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
-  deployments     Deployment[]
-
-  @@unique([repositoryId, number])
-  @@index([repositoryId])
-}
-
-model Deployment {
-  id           String           @id @default(uuid())
-  pullRequestId String
-  commitSha    String
-  status       DeploymentStatus @default(BUILDING)
-  previewUrl   String?
-  containerId  String?
-  hostPort     Int?
-  buildLogs    String?          @db.Text
-  errorMessage String?
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
-
-  pullRequest  PullRequest      @relation(fields: [pullRequestId], references: [id], onDelete: Cascade)
-
-  @@index([pullRequestId, createdAt])
 }

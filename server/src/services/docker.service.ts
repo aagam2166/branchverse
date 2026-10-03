@@ -24,7 +24,7 @@ export class DockerService {
         const stream = await docker.buildImage(
             {
                 context: contextPath,
-                src: fs.readdirSync(contextPath)
+                src: fs.readdirSync(contextPath).filter(file => file !== '.git' && file !== 'node_modules')
             },
             {
                 t: imageName,
@@ -129,7 +129,7 @@ export class DockerService {
 
     async removeContainer(containerId: string) {
         const container = docker.getContainer(containerId);
-        await container.remove();
+        await container.remove();   
         return true;
     }
 

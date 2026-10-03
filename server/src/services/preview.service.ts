@@ -3,6 +3,7 @@ import fs from "fs";
 import dockerService from "./docker.service.js";
 import { cloneAtCommit, cleanupWorkspace } from "./git.service.js";
 import { prisma } from "../lib/prisma.js";
+import { Octokit } from "@octokit/rest";
 import type { DeployPreviewRequest, DeployPreviewResult } from "../types/deployment.js";
 
 const PREVIEW_DOCKERFILE = path.resolve("docker", "Dockerfile.preview");
@@ -25,47 +26,96 @@ export const deployPreview = async (
             branch
         );
         buildLogs.push(`Workspace ready at ${workspacePath}`);
-        // Check if the repo has a stored appDirectory config in DB
-        const repoConfig = await (prisma as any).repository.findUnique({
+        const repoConfig = await prisma.repository.findUnique({
             where: { fullName: repositoryFullName },
-            select: { appDirectory: true },
+            select: { appDirectory: true, buildCommand: true, installCommand: true },
         });
 
         let appPath = workspacePath;
+        let detectedType: "DOCKERFILE" | "NODE" | "STATIC" | "PYTHON" | "GO" | null = null;
 
-        if (repoConfig?.appDirectory) {
+        const checkType = (dirPath: string) => {
+            if (fs.existsSync(path.join(dirPath, "Dockerfile"))) return "DOCKERFILE";
+            if (fs.existsSync(path.join(dirPath, "package.json"))) return "NODE";
+            if (fs.existsSync(path.join(dirPath, "requirements.txt")) || fs.existsSync(path.join(dirPath, "pyproject.toml"))) return "PYTHON";
+            if (fs.existsSync(path.join(dirPath, "go.mod"))) return "GO";
+            if (fs.existsSync(path.join(dirPath, "index.html"))) return "STATIC";
+            return null;
+        };
+
+        if (repoConfig?.appDirectory && repoConfig.appDirectory !== ".") {
             // Use explicitly configured directory
             appPath = path.join(workspacePath, repoConfig.appDirectory);
             buildLogs.push(`Using configured app directory: ${repoConfig.appDirectory}/`);
+            detectedType = checkType(appPath);
         } else {
-            // Auto-detect from common frontend subdirectory names
-            const frontendDirs = ["frontend", "client", "web", "app"];
-            for (const dir of frontendDirs) {
-                const candidatePath = path.join(workspacePath, dir);
-                if (
-                    fs.existsSync(candidatePath) &&
-                    fs.existsSync(path.join(candidatePath, "package.json"))
-                ) {
-                    appPath = candidatePath;
-                    buildLogs.push(`Detected frontend directory: ${dir}/`);
-                    break;
+            // Auto-detect from root first
+            detectedType = checkType(workspacePath);
+            if (!detectedType) {
+                // Scan 1-level deep subfolders
+                const frontendDirs = ["client", "frontend", "web", "app", "src"];
+                for (const dir of frontendDirs) {
+                    const candidatePath = path.join(workspacePath, dir);
+                    if (fs.existsSync(candidatePath)) {
+                        const type = checkType(candidatePath);
+                        if (type) {
+                            appPath = candidatePath;
+                            detectedType = type;
+                            buildLogs.push(`Auto-detected ${type} in directory: ${dir}/`);
+                            break;
+                        }
+                    }
                 }
+            } else {
+                buildLogs.push(`Auto-detected ${detectedType} in root directory`);
             }
         }
 
-        // Ensure there's either a package.json or an index.html to build/serve
-        const hasPackageJson = fs.existsSync(path.join(appPath, "package.json"));
-        const hasIndexHtml = fs.existsSync(path.join(appPath, "index.html"));
-        if (!hasPackageJson && !hasIndexHtml) {
-            throw new Error(`No package.json or index.html found in '${appPath}'. Set appDirectory when connecting this repo.`);
+        if (!detectedType) {
+            throw new Error("Unable to detect application type. Please add a Dockerfile or configure the Root Directory in repository settings.");
         }
 
+        let containerPort = CONTAINER_INTERNAL_PORT;
 
-        fs.copyFileSync(
-            PREVIEW_DOCKERFILE,
-            path.join(appPath, "Dockerfile")
-        );
-        buildLogs.push("Dockerfile copied to workspace");
+        if (detectedType === "DOCKERFILE") {
+            buildLogs.push("Using custom Dockerfile from repository");
+        } else {
+            const templateName = `Dockerfile.${detectedType.toLowerCase()}`;
+            const dockerfileToUse = path.resolve("docker", templateName);
+            
+            if (detectedType === "STATIC") {
+                containerPort = 80;
+            }
+
+            if (fs.existsSync(dockerfileToUse)) {
+                fs.copyFileSync(dockerfileToUse, path.join(appPath, "Dockerfile"));
+                buildLogs.push(`Copied template ${templateName} to workspace`);
+            } else {
+                fs.copyFileSync(PREVIEW_DOCKERFILE, path.join(appPath, "Dockerfile"));
+                buildLogs.push("Default Dockerfile copied to workspace");
+            }
+
+            // Inject custom commands if configured
+            const dockerfilePath = path.join(appPath, "Dockerfile");
+            let dockerfileContent = fs.readFileSync(dockerfilePath, "utf-8");
+            
+            if (repoConfig?.installCommand) {
+                dockerfileContent = dockerfileContent.replace(/RUN npm install/g, `RUN ${repoConfig.installCommand}`);
+                buildLogs.push(`Injected custom install command: ${repoConfig.installCommand}`);
+            }
+            
+            if (repoConfig?.buildCommand) {
+                const lines = dockerfileContent.split("\n");
+                const insertIndex = lines.findIndex(l => l.startsWith("EXPOSE") || l.startsWith("CMD"));
+                if (insertIndex !== -1) {
+                    lines.splice(insertIndex, 0, `RUN ${repoConfig.buildCommand}`);
+                    dockerfileContent = lines.join("\n");
+                    buildLogs.push(`Injected custom build command: ${repoConfig.buildCommand}`);
+                }
+            }
+            
+            fs.writeFileSync(dockerfilePath, dockerfileContent);
+        }
 
         const imageName = `branchverse-preview-${deploymentId}`.toLowerCase();
         buildLogs.push(`Building Docker image: ${imageName}...`);
@@ -83,7 +133,7 @@ export const deployPreview = async (
         const container = await dockerService.createContainer({
             imageName,
             containerName,
-            containerPort: CONTAINER_INTERNAL_PORT,
+            containerPort: containerPort,
         });
 
         const containerId = container.id;
@@ -94,7 +144,7 @@ export const deployPreview = async (
 
         const hostPort = await dockerService.getContainerPort(
             containerId,
-            CONTAINER_INTERNAL_PORT
+            containerPort
         );
 
         const previewUrl = `http://localhost:${hostPort}`;
@@ -107,6 +157,36 @@ export const deployPreview = async (
             hostPort,
             buildLogs: buildLogs.join("\n"),
         });
+
+        const deploymentRecord = await prisma.deployment.findUnique({
+            where: { id: deploymentId },
+            include: { pullRequest: true },
+        });
+
+        if (deploymentRecord?.pullRequest) {
+            const [owner, repo] = repositoryFullName.split("/");
+            if (owner && repo) {
+                try {
+                    const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN?.trim() });
+                    
+                    await octokit.issues.createComment({
+                        owner,
+                        repo,
+                        issue_number: deploymentRecord.pullRequest.number,
+                        body: `**BranchVerse Preview is LIVE!**\n\n- **Commit**: \`${commitSha.substring(0, 7)}\`\n- **Preview URL**: [${previewUrl}](${previewUrl})\n\n_Deployed automatically by BranchVerse._`,
+                    });
+                    buildLogs.push("Posted preview URL comment to GitHub PR");
+                } catch (err) {
+                    console.error("Failed to post PR comment", err);
+                    buildLogs.push("Warning: Failed to post PR comment to GitHub");
+                }
+
+                // Update logs again to include the comment action
+                await updateDeploymentInDb(deploymentId, {
+                    buildLogs: buildLogs.join("\n")
+                });
+            }
+        }
 
         return {
             status: "LIVE",

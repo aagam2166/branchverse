@@ -15,12 +15,26 @@ export const fetchRepositories = async (): Promise<Repository[]> => {
 
 export const connectRepository = async (
   repositoryFullName: string,
-  appDirectory?: string
+  appDirectory?: string,
+  buildCommand?: string,
+  installCommand?: string,
+  productionUrl?: string
 ): Promise<{ message: string; repository: Repository; webhookUrl: string; warning?: string }> => {
   const response = await api.post<{ message: string; repository: Repository; webhookUrl: string; warning?: string }>(
     "/repos/connect",
-    { repositoryFullName, appDirectory }
+    { repositoryFullName, appDirectory, buildCommand, installCommand, productionUrl }
   );
+  return response.data;
+};
+
+export const inspectRepository = async (
+  repositoryFullName: string,
+  appDirectory?: string
+): Promise<{ type: string | null; path: string }> => {
+  const response = await api.post<{ type: string | null; path: string }>("/repos/inspect", {
+    repositoryFullName,
+    appDirectory,
+  });
   return response.data;
 };
 

@@ -39,8 +39,11 @@ export type RepositoryMinAggregateOutputType = {
   fullName: string | null
   defaultBranch: string | null
   appDirectory: string | null
-  webhookSecret: string | null
+  buildCommand: string | null
+  installCommand: string | null
+  productionUrl: string | null
   webhookId: number | null
+  webhookSecret: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -50,8 +53,11 @@ export type RepositoryMaxAggregateOutputType = {
   fullName: string | null
   defaultBranch: string | null
   appDirectory: string | null
-  webhookSecret: string | null
+  buildCommand: string | null
+  installCommand: string | null
+  productionUrl: string | null
   webhookId: number | null
+  webhookSecret: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -61,8 +67,11 @@ export type RepositoryCountAggregateOutputType = {
   fullName: number
   defaultBranch: number
   appDirectory: number
-  webhookSecret: number
+  buildCommand: number
+  installCommand: number
+  productionUrl: number
   webhookId: number
+  webhookSecret: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -82,8 +91,11 @@ export type RepositoryMinAggregateInputType = {
   fullName?: true
   defaultBranch?: true
   appDirectory?: true
-  webhookSecret?: true
+  buildCommand?: true
+  installCommand?: true
+  productionUrl?: true
   webhookId?: true
+  webhookSecret?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -93,8 +105,11 @@ export type RepositoryMaxAggregateInputType = {
   fullName?: true
   defaultBranch?: true
   appDirectory?: true
-  webhookSecret?: true
+  buildCommand?: true
+  installCommand?: true
+  productionUrl?: true
   webhookId?: true
+  webhookSecret?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -104,8 +119,11 @@ export type RepositoryCountAggregateInputType = {
   fullName?: true
   defaultBranch?: true
   appDirectory?: true
-  webhookSecret?: true
+  buildCommand?: true
+  installCommand?: true
+  productionUrl?: true
   webhookId?: true
+  webhookSecret?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -202,8 +220,11 @@ export type RepositoryGroupByOutputType = {
   fullName: string
   defaultBranch: string
   appDirectory: string | null
-  webhookSecret: string | null
+  buildCommand: string | null
+  installCommand: string | null
+  productionUrl: string | null
   webhookId: number | null
+  webhookSecret: string | null
   createdAt: Date
   updatedAt: Date
   _count: RepositoryCountAggregateOutputType | null
@@ -236,8 +257,11 @@ export type RepositoryWhereInput = {
   fullName?: Prisma.StringFilter<"Repository"> | string
   defaultBranch?: Prisma.StringFilter<"Repository"> | string
   appDirectory?: Prisma.StringNullableFilter<"Repository"> | string | null
-  webhookSecret?: Prisma.StringNullableFilter<"Repository"> | string | null
+  buildCommand?: Prisma.StringNullableFilter<"Repository"> | string | null
+  installCommand?: Prisma.StringNullableFilter<"Repository"> | string | null
+  productionUrl?: Prisma.StringNullableFilter<"Repository"> | string | null
   webhookId?: Prisma.IntNullableFilter<"Repository"> | number | null
+  webhookSecret?: Prisma.StringNullableFilter<"Repository"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Repository"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Repository"> | Date | string
   pullRequests?: Prisma.PullRequestListRelationFilter
@@ -248,8 +272,11 @@ export type RepositoryOrderByWithRelationInput = {
   fullName?: Prisma.SortOrder
   defaultBranch?: Prisma.SortOrder
   appDirectory?: Prisma.SortOrderInput | Prisma.SortOrder
-  webhookSecret?: Prisma.SortOrderInput | Prisma.SortOrder
+  buildCommand?: Prisma.SortOrderInput | Prisma.SortOrder
+  installCommand?: Prisma.SortOrderInput | Prisma.SortOrder
+  productionUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   webhookId?: Prisma.SortOrderInput | Prisma.SortOrder
+  webhookSecret?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   pullRequests?: Prisma.PullRequestOrderByRelationAggregateInput
@@ -263,8 +290,11 @@ export type RepositoryWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.RepositoryWhereInput | Prisma.RepositoryWhereInput[]
   defaultBranch?: Prisma.StringFilter<"Repository"> | string
   appDirectory?: Prisma.StringNullableFilter<"Repository"> | string | null
-  webhookSecret?: Prisma.StringNullableFilter<"Repository"> | string | null
+  buildCommand?: Prisma.StringNullableFilter<"Repository"> | string | null
+  installCommand?: Prisma.StringNullableFilter<"Repository"> | string | null
+  productionUrl?: Prisma.StringNullableFilter<"Repository"> | string | null
   webhookId?: Prisma.IntNullableFilter<"Repository"> | number | null
+  webhookSecret?: Prisma.StringNullableFilter<"Repository"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Repository"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Repository"> | Date | string
   pullRequests?: Prisma.PullRequestListRelationFilter
@@ -275,8 +305,11 @@ export type RepositoryOrderByWithAggregationInput = {
   fullName?: Prisma.SortOrder
   defaultBranch?: Prisma.SortOrder
   appDirectory?: Prisma.SortOrderInput | Prisma.SortOrder
-  webhookSecret?: Prisma.SortOrderInput | Prisma.SortOrder
+  buildCommand?: Prisma.SortOrderInput | Prisma.SortOrder
+  installCommand?: Prisma.SortOrderInput | Prisma.SortOrder
+  productionUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   webhookId?: Prisma.SortOrderInput | Prisma.SortOrder
+  webhookSecret?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.RepositoryCountOrderByAggregateInput
@@ -294,8 +327,11 @@ export type RepositoryScalarWhereWithAggregatesInput = {
   fullName?: Prisma.StringWithAggregatesFilter<"Repository"> | string
   defaultBranch?: Prisma.StringWithAggregatesFilter<"Repository"> | string
   appDirectory?: Prisma.StringNullableWithAggregatesFilter<"Repository"> | string | null
-  webhookSecret?: Prisma.StringNullableWithAggregatesFilter<"Repository"> | string | null
+  buildCommand?: Prisma.StringNullableWithAggregatesFilter<"Repository"> | string | null
+  installCommand?: Prisma.StringNullableWithAggregatesFilter<"Repository"> | string | null
+  productionUrl?: Prisma.StringNullableWithAggregatesFilter<"Repository"> | string | null
   webhookId?: Prisma.IntNullableWithAggregatesFilter<"Repository"> | number | null
+  webhookSecret?: Prisma.StringNullableWithAggregatesFilter<"Repository"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Repository"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Repository"> | Date | string
 }
@@ -305,8 +341,11 @@ export type RepositoryCreateInput = {
   fullName: string
   defaultBranch?: string
   appDirectory?: string | null
-  webhookSecret?: string | null
+  buildCommand?: string | null
+  installCommand?: string | null
+  productionUrl?: string | null
   webhookId?: number | null
+  webhookSecret?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   pullRequests?: Prisma.PullRequestCreateNestedManyWithoutRepositoryInput
@@ -317,8 +356,11 @@ export type RepositoryUncheckedCreateInput = {
   fullName: string
   defaultBranch?: string
   appDirectory?: string | null
-  webhookSecret?: string | null
+  buildCommand?: string | null
+  installCommand?: string | null
+  productionUrl?: string | null
   webhookId?: number | null
+  webhookSecret?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutRepositoryInput
@@ -329,8 +371,11 @@ export type RepositoryUpdateInput = {
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   defaultBranch?: Prisma.StringFieldUpdateOperationsInput | string
   appDirectory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  webhookSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buildCommand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  installCommand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  webhookSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pullRequests?: Prisma.PullRequestUpdateManyWithoutRepositoryNestedInput
@@ -341,8 +386,11 @@ export type RepositoryUncheckedUpdateInput = {
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   defaultBranch?: Prisma.StringFieldUpdateOperationsInput | string
   appDirectory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  webhookSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buildCommand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  installCommand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  webhookSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutRepositoryNestedInput
@@ -353,8 +401,11 @@ export type RepositoryCreateManyInput = {
   fullName: string
   defaultBranch?: string
   appDirectory?: string | null
-  webhookSecret?: string | null
+  buildCommand?: string | null
+  installCommand?: string | null
+  productionUrl?: string | null
   webhookId?: number | null
+  webhookSecret?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -364,8 +415,11 @@ export type RepositoryUpdateManyMutationInput = {
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   defaultBranch?: Prisma.StringFieldUpdateOperationsInput | string
   appDirectory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  webhookSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buildCommand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  installCommand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  webhookSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -375,8 +429,11 @@ export type RepositoryUncheckedUpdateManyInput = {
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   defaultBranch?: Prisma.StringFieldUpdateOperationsInput | string
   appDirectory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  webhookSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buildCommand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  installCommand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  webhookSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -386,8 +443,11 @@ export type RepositoryCountOrderByAggregateInput = {
   fullName?: Prisma.SortOrder
   defaultBranch?: Prisma.SortOrder
   appDirectory?: Prisma.SortOrder
-  webhookSecret?: Prisma.SortOrder
+  buildCommand?: Prisma.SortOrder
+  installCommand?: Prisma.SortOrder
+  productionUrl?: Prisma.SortOrder
   webhookId?: Prisma.SortOrder
+  webhookSecret?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -401,8 +461,11 @@ export type RepositoryMaxOrderByAggregateInput = {
   fullName?: Prisma.SortOrder
   defaultBranch?: Prisma.SortOrder
   appDirectory?: Prisma.SortOrder
-  webhookSecret?: Prisma.SortOrder
+  buildCommand?: Prisma.SortOrder
+  installCommand?: Prisma.SortOrder
+  productionUrl?: Prisma.SortOrder
   webhookId?: Prisma.SortOrder
+  webhookSecret?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -412,8 +475,11 @@ export type RepositoryMinOrderByAggregateInput = {
   fullName?: Prisma.SortOrder
   defaultBranch?: Prisma.SortOrder
   appDirectory?: Prisma.SortOrder
-  webhookSecret?: Prisma.SortOrder
+  buildCommand?: Prisma.SortOrder
+  installCommand?: Prisma.SortOrder
+  productionUrl?: Prisma.SortOrder
   webhookId?: Prisma.SortOrder
+  webhookSecret?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -466,8 +532,11 @@ export type RepositoryCreateWithoutPullRequestsInput = {
   fullName: string
   defaultBranch?: string
   appDirectory?: string | null
-  webhookSecret?: string | null
+  buildCommand?: string | null
+  installCommand?: string | null
+  productionUrl?: string | null
   webhookId?: number | null
+  webhookSecret?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -477,8 +546,11 @@ export type RepositoryUncheckedCreateWithoutPullRequestsInput = {
   fullName: string
   defaultBranch?: string
   appDirectory?: string | null
-  webhookSecret?: string | null
+  buildCommand?: string | null
+  installCommand?: string | null
+  productionUrl?: string | null
   webhookId?: number | null
+  webhookSecret?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -504,8 +576,11 @@ export type RepositoryUpdateWithoutPullRequestsInput = {
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   defaultBranch?: Prisma.StringFieldUpdateOperationsInput | string
   appDirectory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  webhookSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buildCommand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  installCommand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  webhookSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -515,8 +590,11 @@ export type RepositoryUncheckedUpdateWithoutPullRequestsInput = {
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   defaultBranch?: Prisma.StringFieldUpdateOperationsInput | string
   appDirectory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  webhookSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buildCommand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  installCommand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productionUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  webhookSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -557,8 +635,11 @@ export type RepositorySelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   fullName?: boolean
   defaultBranch?: boolean
   appDirectory?: boolean
-  webhookSecret?: boolean
+  buildCommand?: boolean
+  installCommand?: boolean
+  productionUrl?: boolean
   webhookId?: boolean
+  webhookSecret?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   pullRequests?: boolean | Prisma.Repository$pullRequestsArgs<ExtArgs>
@@ -570,8 +651,11 @@ export type RepositorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   fullName?: boolean
   defaultBranch?: boolean
   appDirectory?: boolean
-  webhookSecret?: boolean
+  buildCommand?: boolean
+  installCommand?: boolean
+  productionUrl?: boolean
   webhookId?: boolean
+  webhookSecret?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["repository"]>
@@ -581,8 +665,11 @@ export type RepositorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   fullName?: boolean
   defaultBranch?: boolean
   appDirectory?: boolean
-  webhookSecret?: boolean
+  buildCommand?: boolean
+  installCommand?: boolean
+  productionUrl?: boolean
   webhookId?: boolean
+  webhookSecret?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["repository"]>
@@ -592,13 +679,16 @@ export type RepositorySelectScalar = {
   fullName?: boolean
   defaultBranch?: boolean
   appDirectory?: boolean
-  webhookSecret?: boolean
+  buildCommand?: boolean
+  installCommand?: boolean
+  productionUrl?: boolean
   webhookId?: boolean
+  webhookSecret?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type RepositoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "defaultBranch" | "appDirectory" | "webhookSecret" | "webhookId" | "createdAt" | "updatedAt", ExtArgs["result"]["repository"]>
+export type RepositoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "defaultBranch" | "appDirectory" | "buildCommand" | "installCommand" | "productionUrl" | "webhookId" | "webhookSecret" | "createdAt" | "updatedAt", ExtArgs["result"]["repository"]>
 export type RepositoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pullRequests?: boolean | Prisma.Repository$pullRequestsArgs<ExtArgs>
   _count?: boolean | Prisma.RepositoryCountOutputTypeDefaultArgs<ExtArgs>
@@ -616,8 +706,11 @@ export type $RepositoryPayload<ExtArgs extends runtime.Types.Extensions.Internal
     fullName: string
     defaultBranch: string
     appDirectory: string | null
-    webhookSecret: string | null
+    buildCommand: string | null
+    installCommand: string | null
+    productionUrl: string | null
     webhookId: number | null
+    webhookSecret: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["repository"]>
@@ -1048,8 +1141,11 @@ export interface RepositoryFieldRefs {
   readonly fullName: Prisma.FieldRef<"Repository", 'String'>
   readonly defaultBranch: Prisma.FieldRef<"Repository", 'String'>
   readonly appDirectory: Prisma.FieldRef<"Repository", 'String'>
-  readonly webhookSecret: Prisma.FieldRef<"Repository", 'String'>
+  readonly buildCommand: Prisma.FieldRef<"Repository", 'String'>
+  readonly installCommand: Prisma.FieldRef<"Repository", 'String'>
+  readonly productionUrl: Prisma.FieldRef<"Repository", 'String'>
   readonly webhookId: Prisma.FieldRef<"Repository", 'Int'>
+  readonly webhookSecret: Prisma.FieldRef<"Repository", 'String'>
   readonly createdAt: Prisma.FieldRef<"Repository", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Repository", 'DateTime'>
 }

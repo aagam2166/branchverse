@@ -13,6 +13,9 @@ export interface Repository {
   fullName: string;
   defaultBranch: string;
   appDirectory?: string | null;
+  buildCommand?: string | null;
+  installCommand?: string | null;
+  productionUrl?: string | null;
   webhookSecret?: string | null;
   createdAt: string;
   updatedAt: string;

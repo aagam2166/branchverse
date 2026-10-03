@@ -685,8 +685,11 @@ export const RepositoryScalarFieldEnum = {
   fullName: 'fullName',
   defaultBranch: 'defaultBranch',
   appDirectory: 'appDirectory',
-  webhookSecret: 'webhookSecret',
+  buildCommand: 'buildCommand',
+  installCommand: 'installCommand',
+  productionUrl: 'productionUrl',
   webhookId: 'webhookId',
+  webhookSecret: 'webhookSecret',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

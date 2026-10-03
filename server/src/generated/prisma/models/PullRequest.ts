@@ -264,8 +264,8 @@ export type PullRequestWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"PullRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PullRequest"> | Date | string
   closedAt?: Prisma.DateTimeNullableFilter<"PullRequest"> | Date | string | null
-  repository?: Prisma.XOR<Prisma.RepositoryScalarRelationFilter, Prisma.RepositoryWhereInput>
   deployments?: Prisma.DeploymentListRelationFilter
+  repository?: Prisma.XOR<Prisma.RepositoryScalarRelationFilter, Prisma.RepositoryWhereInput>
 }
 
 export type PullRequestOrderByWithRelationInput = {
@@ -280,8 +280,8 @@ export type PullRequestOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   closedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  repository?: Prisma.RepositoryOrderByWithRelationInput
   deployments?: Prisma.DeploymentOrderByRelationAggregateInput
+  repository?: Prisma.RepositoryOrderByWithRelationInput
 }
 
 export type PullRequestWhereUniqueInput = Prisma.AtLeast<{
@@ -300,8 +300,8 @@ export type PullRequestWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"PullRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PullRequest"> | Date | string
   closedAt?: Prisma.DateTimeNullableFilter<"PullRequest"> | Date | string | null
-  repository?: Prisma.XOR<Prisma.RepositoryScalarRelationFilter, Prisma.RepositoryWhereInput>
   deployments?: Prisma.DeploymentListRelationFilter
+  repository?: Prisma.XOR<Prisma.RepositoryScalarRelationFilter, Prisma.RepositoryWhereInput>
 }, "id" | "repositoryId_number">
 
 export type PullRequestOrderByWithAggregationInput = {
@@ -351,8 +351,8 @@ export type PullRequestCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   closedAt?: Date | string | null
-  repository: Prisma.RepositoryCreateNestedOneWithoutPullRequestsInput
   deployments?: Prisma.DeploymentCreateNestedManyWithoutPullRequestInput
+  repository: Prisma.RepositoryCreateNestedOneWithoutPullRequestsInput
 }
 
 export type PullRequestUncheckedCreateInput = {
@@ -381,8 +381,8 @@ export type PullRequestUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  repository?: Prisma.RepositoryUpdateOneRequiredWithoutPullRequestsNestedInput
   deployments?: Prisma.DeploymentUpdateManyWithoutPullRequestNestedInput
+  repository?: Prisma.RepositoryUpdateOneRequiredWithoutPullRequestsNestedInput
 }
 
 export type PullRequestUncheckedUpdateInput = {
@@ -823,8 +823,8 @@ export type PullRequestSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   createdAt?: boolean
   updatedAt?: boolean
   closedAt?: boolean
-  repository?: boolean | Prisma.RepositoryDefaultArgs<ExtArgs>
   deployments?: boolean | Prisma.PullRequest$deploymentsArgs<ExtArgs>
+  repository?: boolean | Prisma.RepositoryDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.PullRequestCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["pullRequest"]>
 
@@ -874,8 +874,8 @@ export type PullRequestSelectScalar = {
 
 export type PullRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "repositoryId" | "number" | "title" | "author" | "branch" | "latestCommitSha" | "state" | "createdAt" | "updatedAt" | "closedAt", ExtArgs["result"]["pullRequest"]>
 export type PullRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  repository?: boolean | Prisma.RepositoryDefaultArgs<ExtArgs>
   deployments?: boolean | Prisma.PullRequest$deploymentsArgs<ExtArgs>
+  repository?: boolean | Prisma.RepositoryDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.PullRequestCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PullRequestIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -888,8 +888,8 @@ export type PullRequestIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.
 export type $PullRequestPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PullRequest"
   objects: {
-    repository: Prisma.$RepositoryPayload<ExtArgs>
     deployments: Prisma.$DeploymentPayload<ExtArgs>[]
+    repository: Prisma.$RepositoryPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1297,8 +1297,8 @@ readonly fields: PullRequestFieldRefs;
  */
 export interface Prisma__PullRequestClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  repository<T extends Prisma.RepositoryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RepositoryDefaultArgs<ExtArgs>>): Prisma.Prisma__RepositoryClient<runtime.Types.Result.GetResult<Prisma.$RepositoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   deployments<T extends Prisma.PullRequest$deploymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PullRequest$deploymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeploymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  repository<T extends Prisma.RepositoryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RepositoryDefaultArgs<ExtArgs>>): Prisma.Prisma__RepositoryClient<runtime.Types.Result.GetResult<Prisma.$RepositoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.

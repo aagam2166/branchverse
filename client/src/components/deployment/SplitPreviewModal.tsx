@@ -28,7 +28,9 @@ export function SplitPreviewModal({
   deployment,
 }: SplitPreviewModalProps) {
   const [deviceMode, setDeviceMode] = useState<"desktop" | "tablet" | "mobile">("desktop");
-  const [baselineUrl, setBaselineUrl] = useState<string>("https://example.com");
+  const [baselineUrl, setBaselineUrl] = useState<string>(
+    pullRequest.repository?.productionUrl || ""
+  );
   const [syncScroll, setSyncScroll] = useState<boolean>(true);
   const [refreshKey, setRefreshKey] = useState<number>(0);
 
