@@ -37,7 +37,6 @@ export function SplitPreviewModal({
     pullRequest.repository?.baselineStatus || null
   );
   const [isDeployingBaseline, setIsDeployingBaseline] = useState(false);
-  const [syncScroll, setSyncScroll] = useState<boolean>(true);
   const [refreshKey, setRefreshKey] = useState<number>(0);
 
   const previewFrameRef = useRef<HTMLIFrameElement>(null);
@@ -66,67 +65,6 @@ export function SplitPreviewModal({
       if (intervalId) clearInterval(intervalId);
     };
   }, [baselineStatus, pullRequest.repository.id]);
-
-  useEffect(() => {
-    if (!syncScroll) return;
-
-    const left = previewFrameRef.current;
-    const right = baselineFrameRef.current;
-
-    let isSyncingLeft = false;
-    let isSyncingRight = false;
-
-    const handleScrollLeft = () => {
-      if (isSyncingLeft) {
-        isSyncingLeft = false;
-        return;
-      }
-      isSyncingRight = true;
-      try {
-        if (right?.contentWindow && left?.contentWindow) {
-          right.contentWindow.scrollTo(left.contentWindow.scrollX, left.contentWindow.scrollY);
-        }
-      } catch (e) {
-        // CORS blocked
-      }
-    };
-
-    const handleScrollRight = () => {
-      if (isSyncingRight) {
-        isSyncingRight = false;
-        return;
-      }
-      isSyncingLeft = true;
-      try {
-        if (left?.contentWindow && right?.contentWindow) {
-          left.contentWindow.scrollTo(right.contentWindow.scrollX, right.contentWindow.scrollY);
-        }
-      } catch (e) {
-        // CORS blocked
-      }
-    };
-
-    const attachListeners = () => {
-      try {
-        left?.contentWindow?.addEventListener("scroll", handleScrollLeft);
-        right?.contentWindow?.addEventListener("scroll", handleScrollRight);
-      } catch (e) {
-        console.warn("Cross-origin scroll sync is restricted by browser security policies.");
-      }
-    };
-
-    left?.addEventListener("load", attachListeners);
-    right?.addEventListener("load", attachListeners);
-
-    return () => {
-      left?.removeEventListener("load", attachListeners);
-      right?.removeEventListener("load", attachListeners);
-      try {
-        left?.contentWindow?.removeEventListener("scroll", handleScrollLeft);
-        right?.contentWindow?.removeEventListener("scroll", handleScrollRight);
-      } catch (e) {}
-    };
-  }, [syncScroll, previewUrl, baselineUrl, refreshKey]);
 
   const handleDeployBaseline = async () => {
     try {
@@ -213,17 +151,7 @@ export function SplitPreviewModal({
               </button>
             </div>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setSyncScroll(!syncScroll)}
-              className={`gap-1.5 text-xs border-slate-800 cursor-pointer ${
-                syncScroll ? "text-cyan-400 border-cyan-500/30 bg-cyan-950/30" : "text-slate-400"
-              }`}
-            >
-              <Link2 className="h-3.5 w-3.5" />
-              <span>Sync Mode: {syncScroll ? "ON" : "OFF"}</span>
-            </Button>
+
 
             <Button
               variant="outline"

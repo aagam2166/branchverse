@@ -1,43 +1,51 @@
 import { useState, useEffect } from "react";
-import { FolderGit2, X, Plus, Trash2, Copy, Check, Terminal, ExternalLink } from "lucide-react";
+import { X, ExternalLink, Search, ChevronLeft } from "lucide-react";
 import { Button } from "../ui/button.js";
 import { Input } from "../ui/input.js";
+
 import { 
   fetchRepositories, 
   connectRepository, 
-  deleteRepository, 
   inspectRepository,
   fetchUserGitHubRepos,
-  type UserGitHubRepo 
+  type UserGitHubRepo,
+  type User
 } from "../../services/api.js";
 import type { Repository } from "../../types/index.js";
+
+const GithubIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+    <path d="M9 18c-4.51 2-5-2-7-2" />
+  </svg>
+);
 
 interface ConnectRepoModalProps {
   isOpen: boolean;
   onClose: () => void;
   onRepoUpdated: () => void;
+  user?: User | null;
 }
 
-export function ConnectRepoModal({ isOpen, onClose, onRepoUpdated }: ConnectRepoModalProps) {
+export function ConnectRepoModal({ isOpen, onClose, onRepoUpdated, user }: ConnectRepoModalProps) {
   const [repositories, setRepositories] = useState<Repository[]>([]);
   const [userGitHubRepos, setUserGitHubRepos] = useState<UserGitHubRepo[]>([]);
+  
+  const [step, setStep] = useState<"list" | "configure">("list");
+  
   const [fullName, setFullName] = useState("");
   const [appDirectory, setAppDirectory] = useState("");
   const [installCommand, setInstallCommand] = useState("");
   const [buildCommand, setBuildCommand] = useState("");
   const [productionUrl, setProductionUrl] = useState("");
+  
+  const [searchQuery, setSearchQuery] = useState("");
+  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [warning, setWarning] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
-  const [serverWebhookUrl, setServerWebhookUrl] = useState<string>("");
   
   const [inspecting, setInspecting] = useState(false);
   const [detectedStack, setDetectedStack] = useState<{ type: string | null; path: string } | null>(null);
-
-  const webhookUrl = serverWebhookUrl || (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-    ? "https://stiffness-clamshell-unable.ngrok-free.dev/api/webhooks/github"
-    : `${window.location.origin}/api/webhooks/github`);
 
   const loadRepos = async () => {
     try {
@@ -53,7 +61,6 @@ export function ConnectRepoModal({ isOpen, onClose, onRepoUpdated }: ConnectRepo
       const repos = await fetchUserGitHubRepos();
       setUserGitHubRepos(repos);
     } catch (err) {
-      // User might not be logged in or token expired
       setUserGitHubRepos([]);
     }
   };
@@ -62,66 +69,52 @@ export function ConnectRepoModal({ isOpen, onClose, onRepoUpdated }: ConnectRepo
     if (isOpen) {
       loadRepos();
       loadUserGitHubRepos();
+      setStep("list");
       setError(null);
-      setWarning(null);
       setDetectedStack(null);
     }
   }, [isOpen]);
 
-  const handleInspect = async () => {
-    if (!fullName || !fullName.includes("/")) return;
+  const handleInspect = async (repoName: string, dir: string) => {
     try {
       setInspecting(true);
-      setError(null);
-      const res = await inspectRepository(fullName.trim(), appDirectory.trim() || undefined);
+      const res = await inspectRepository(repoName, dir || undefined);
       setDetectedStack(res);
     } catch (err: any) {
-      setDetectedStack({ type: null, path: appDirectory || "root" });
+      setDetectedStack({ type: null, path: dir || "root" });
     } finally {
       setInspecting(false);
     }
   };
 
-  if (!isOpen) return null;
+  const handleImportClick = (repoFullName: string) => {
+    setFullName(repoFullName);
+    setAppDirectory("");
+    setInstallCommand("");
+    setBuildCommand("");
+    setProductionUrl("");
+    setStep("configure");
+    handleInspect(repoFullName, "");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanName = fullName
-      .trim()
-      .replace(/^(https?:\/\/)?(www\.)?github\.com\//i, "")
-      .replace(/\.git$/i, "")
-      .replace(/^\/+|\/+$/g, "");
-
-    if (!cleanName || !cleanName.includes("/")) {
-      setError("Please specify a valid repository in 'owner/repo' format (e.g. 0xJainam/IE-WEB-RECS)");
-      return;
-    }
+    if (!fullName) return;
 
     try {
       setLoading(true);
       setError(null);
-      setWarning(null);
-      const res = await connectRepository(
-        cleanName,
+      await connectRepository(
+        fullName,
         appDirectory.trim() || undefined,
         buildCommand.trim() || undefined,
         installCommand.trim() || undefined,
         productionUrl.trim() || undefined
       );
-      if (res.warning) {
-        setWarning(res.warning);
-      }
-      if (res.webhookUrl) {
-        setServerWebhookUrl(res.webhookUrl);
-      }
-      setFullName("");
-      setAppDirectory("");
-      setInstallCommand("");
-      setBuildCommand("");
-      setProductionUrl("");
-      setDetectedStack(null);
+      
       await loadRepos();
       onRepoUpdated();
+      onClose();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to connect repository");
     } finally {
@@ -129,266 +122,194 @@ export function ConnectRepoModal({ isOpen, onClose, onRepoUpdated }: ConnectRepo
     }
   };
 
-  const handleDelete = async (id: string) => {
-    try {
-      await deleteRepository(id);
-      await loadRepos();
-      onRepoUpdated();
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  if (!isOpen) return null;
 
-  const handleCopyWebhook = () => {
-    navigator.clipboard.writeText(webhookUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  const filteredRepos = userGitHubRepos.filter(repo => 
+    repo.fullName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="flex w-full max-w-xl flex-col rounded-2xl border border-slate-800 bg-[#090d16] shadow-2xl overflow-hidden">
-        <div className="flex items-center justify-between border-b border-slate-800/80 bg-slate-900/80 px-6 py-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="flex w-full max-w-[800px] flex-col rounded-xl border border-[#333] bg-[#000] shadow-2xl overflow-hidden max-h-[85vh]">
+        
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-[#333] px-6 py-4 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-cyan-500/10 p-2 border border-cyan-500/20">
-              <FolderGit2 className="h-5 w-5 text-cyan-400" />
-            </div>
-            <div>
-              <h3 className="font-heading text-lg font-bold text-slate-100">
-                Connect GitHub Repository
-              </h3>
-              <p className="text-xs text-slate-400">
-                Register a repository to receive automated preview deployments
-              </p>
-            </div>
+            {step === "configure" && (
+              <Button variant="ghost" size="icon" onClick={() => setStep("list")} className="mr-2 h-8 w-8 hover:bg-[#222]">
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+            )}
+            <h2 className="text-xl font-bold text-slate-100 tracking-tight">
+              {step === "list" ? "Let's build something new" : "Configure Project"}
+            </h2>
           </div>
           <Button
             variant="ghost"
-            size="iconSm"
+            size="icon"
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-100 cursor-pointer"
+            className="text-slate-400 hover:text-white hover:bg-[#222]"
           >
             <X className="h-5 w-5" />
           </Button>
         </div>
 
-        <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Repository Full Name
-              </label>
-
-              {userGitHubRepos.length > 0 && (
-                <select
-                  onChange={(e) => setFullName(e.target.value)}
-                  value={fullName}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs font-mono text-cyan-300 mb-2 focus:outline-none focus:border-cyan-500"
-                >
-                  <option value="">-- Select from your GitHub Repositories --</option>
-                  {userGitHubRepos.map((r) => (
-                    <option key={r.id} value={r.fullName}>
-                      {r.fullName} {r.private ? "🔒 (Private)" : "🌐 (Public)"}
-                    </option>
-                  ))}
-                </select>
-              )}
-
-              <Input
-                type="text"
-                placeholder="e.g. octocat/hello-world"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="bg-slate-950 border-slate-800 font-mono text-xs"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Production URL <span className="text-slate-500 font-normal">(Optional, for Timeline Comparison)</span>
-              </label>
-              <Input
-                type="text"
-                placeholder="e.g. https://my-main-website.com"
-                value={productionUrl}
-                onChange={(e) => setProductionUrl(e.target.value)}
-                className="bg-slate-950 border-slate-800 font-mono text-xs"
-              />
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-semibold text-slate-300">
-                  App Directory <span className="text-slate-500 font-normal">(Optional)</span>
-                </label>
-                <Button 
-                  type="button" 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={handleInspect}
-                  disabled={inspecting || !fullName}
-                  className="h-6 px-2 text-[10px] text-cyan-400 cursor-pointer"
-                >
-                  {inspecting ? "Detecting..." : "Auto-detect Stack"}
-                </Button>
-              </div>
-              <Input
-                type="text"
-                placeholder="Leave blank for repo root, or specify e.g. frontend"
-                value={appDirectory}
-                onChange={(e) => {
-                    setAppDirectory(e.target.value);
-                    setDetectedStack(null);
-                }}
-                className="bg-slate-950 border-slate-800 font-mono text-xs mb-2"
-              />
-              {detectedStack && (
-                <div className="rounded-lg bg-slate-900/80 p-2 border border-slate-800/80 text-xs">
-                  {detectedStack.type ? (
-                    <span className="text-cyan-300">✓ Detected: {detectedStack.type} in /{detectedStack.path}</span>
-                  ) : (
-                    <span className="text-amber-400">⚠️ Unable to detect application type. Please ensure a valid app directory or configure a Dockerfile.</span>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-6">
+          {step === "list" ? (
+            <div className="space-y-6 max-w-3xl mx-auto">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Install Command <span className="text-slate-500 font-normal">(Optional)</span>
-                </label>
-                <Input
-                  type="text"
-                  placeholder="e.g. npm install"
-                  value={installCommand}
-                  onChange={(e) => setInstallCommand(e.target.value)}
-                  className="bg-slate-950 border-slate-800 font-mono text-xs"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Build Command <span className="text-slate-500 font-normal">(Optional)</span>
-                </label>
-                <Input
-                  type="text"
-                  placeholder="e.g. npm run build"
-                  value={buildCommand}
-                  onChange={(e) => setBuildCommand(e.target.value)}
-                  className="bg-slate-950 border-slate-800 font-mono text-xs"
-                />
-              </div>
-            </div>
-
-            {error && (
-              <p className="text-xs text-rose-400 font-medium">{error}</p>
-            )}
-
-            {warning && (
-              <div className="rounded-lg bg-amber-500/10 p-3 border border-amber-500/20 text-xs text-amber-300">
-                ⚠️ {warning}
-              </div>
-            )}
-
-            <Button
-              type="submit"
-              variant="glow"
-              disabled={loading}
-              className="w-full gap-2 text-xs"
-            >
-              <Plus className="h-4 w-4" />
-              <span>{loading ? "Connecting..." : "Add Repository"}</span>
-            </Button>
-          </form>
-
-          <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-300">
-                <Terminal className="h-4 w-4 text-cyan-400" />
-                <span>GitHub Webhook Settings</span>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleCopyWebhook}
-                className="h-7 px-2 text-[11px] border-slate-800 gap-1 text-slate-300 cursor-pointer"
-              >
-                {copied ? <Check className="h-3 w-3 text-cyan-400" /> : <Copy className="h-3 w-3" />}
-                <span>{copied ? "Copied" : "Copy URL"}</span>
-              </Button>
-            </div>
-
-            <div className="space-y-1.5 text-xs font-mono text-slate-400 bg-slate-900/90 p-3 rounded-lg border border-slate-800/80">
-              <div className="flex items-center justify-between">
-                <span className="text-slate-500">Payload URL:</span>
-                <span className="text-cyan-300 select-all truncate max-w-[320px]">{webhookUrl}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-500">Content type:</span>
-                <span className="text-slate-200">application/json</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-500">Events:</span>
-                <span className="text-amber-300">Pull requests</span>
-              </div>
-            </div>
-
-            <p className="text-[11px] text-slate-500 leading-normal">
-              In your GitHub repo: <span className="text-slate-300">Settings &rarr; Webhooks &rarr; Add webhook</span>. Paste the Payload URL and select &quot;Let me select individual events &rarr; Pull requests&quot;.
-            </p>
-          </div>
-
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-              Connected Repositories ({repositories.length})
-            </h4>
-
-            {repositories.length === 0 ? (
-              <p className="text-xs text-slate-500 italic py-2">
-                No repositories connected yet. Add one above to start tracking PR previews.
-              </p>
-            ) : (
-              <div className="space-y-2">
-                {repositories.map((repo) => (
-                  <div
-                    key={repo.id}
-                    className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-900/50 p-3 text-xs"
-                  >
-                    <div>
-                      <div className="font-semibold text-slate-200 font-mono">
-                        {repo.fullName}
-                      </div>
-                      <div className="text-[11px] text-slate-500">
-                        Default branch: <span className="text-cyan-400 font-mono">{repo.defaultBranch}</span>
-                      </div>
+                <h3 className="text-lg font-semibold text-white mb-4 tracking-tight">Import Git Repository</h3>
+                <div className="border border-[#333] rounded-lg overflow-hidden bg-[#0a0a0a]">
+                  <div className="flex flex-col sm:flex-row items-center gap-3 p-3 border-b border-[#333] bg-[#050505]">
+                    <div className="flex items-center gap-2 px-3 py-2 bg-[#111] border border-[#333] rounded-md shrink-0 w-full sm:w-auto">
+                      <GithubIcon className="h-4 w-4 text-slate-400" />
+                      <span className="text-sm font-medium text-slate-200">
+                        {user ? user.username : "GitHub"}
+                      </span>
                     </div>
-
-                    <div className="flex items-center gap-2">
-                      <a
-                        href={`https://github.com/${repo.fullName}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="rounded p-1 text-slate-400 hover:text-cyan-400 hover:bg-slate-800"
-                        title="Open on GitHub"
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                      </a>
-                      <Button
-                        variant="destructive"
-                        size="iconSm"
-                        onClick={() => handleDelete(repo.id)}
-                        className="h-7 w-7 cursor-pointer"
-                        title="Disconnect Repository"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
+                    <div className="relative flex-1 w-full">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                      <Input
+                        type="text"
+                        placeholder="Search..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-9 bg-[#111] border-[#333] text-sm text-white"
+                      />
                     </div>
                   </div>
-                ))}
+                  
+                  <div className="divide-y divide-[#222] max-h-[60vh] overflow-y-auto">
+                    {filteredRepos.length > 0 ? (
+                      filteredRepos.map((repo) => {
+                        const isConnected = repositories.some(r => r.fullName === repo.fullName);
+                        return (
+                          <div key={repo.id} className="flex items-center justify-between p-4 hover:bg-[#111] transition-colors">
+                            <div className="flex items-center gap-3">
+                              <GithubIcon className="h-6 w-6 text-slate-300" />
+                              <div className="flex flex-col">
+                                <span className="font-semibold text-slate-200 text-sm">{repo.name}</span>
+                                <span className="text-xs text-slate-500">
+                                  {repo.private ? "Private" : "Public"}
+                                </span>
+                              </div>
+                            </div>
+                            <Button
+                              variant={isConnected ? "outline" : "default"}
+                              size="sm"
+                              disabled={isConnected}
+                              onClick={() => handleImportClick(repo.fullName)}
+                              className={isConnected ? "border-[#333] text-slate-400" : "bg-white text-black hover:bg-neutral-200"}
+                            >
+                              {isConnected ? "Imported" : "Import"}
+                            </Button>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="p-8 text-center text-slate-500 text-sm">
+                        No repositories found.
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="max-w-2xl mx-auto">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="flex items-center gap-4 border border-[#333] p-4 rounded-lg bg-[#0a0a0a]">
+                  <GithubIcon className="h-8 w-8 text-white" />
+                  <div>
+                    <h3 className="text-lg font-bold text-white">{fullName}</h3>
+                    <a href={`https://github.com/${fullName}`} target="_blank" rel="noreferrer" className="text-sm text-slate-400 hover:text-white flex items-center gap-1">
+                      {fullName} <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                </div>
+
+                <div className="border border-[#333] rounded-lg p-6 space-y-5 bg-[#0a0a0a]">
+                  <h4 className="font-semibold text-white">Configure Build Settings</h4>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                      Framework Preset
+                    </label>
+                    <div className="rounded-md border border-[#333] p-3 text-sm text-slate-400 bg-[#111]">
+                      {inspecting ? "Detecting framework..." : detectedStack?.type || "Other (configure manually)"}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                      Root Directory
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="./"
+                      value={appDirectory}
+                      onChange={(e) => setAppDirectory(e.target.value)}
+                      className="bg-[#111] border-[#333] font-mono text-sm text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                      Build Command
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="`npm run build` or `npm run vercel-build`"
+                      value={buildCommand}
+                      onChange={(e) => setBuildCommand(e.target.value)}
+                      className="bg-[#111] border-[#333] font-mono text-sm text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                      Install Command
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="`npm install`, `yarn install` etc."
+                      value={installCommand}
+                      onChange={(e) => setInstallCommand(e.target.value)}
+                      className="bg-[#111] border-[#333] font-mono text-sm text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                      Production URL
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="For comparing visual changes"
+                      value={productionUrl}
+                      onChange={(e) => setProductionUrl(e.target.value)}
+                      className="bg-[#111] border-[#333] font-mono text-sm text-white"
+                    />
+                  </div>
+
+                  {error && (
+                    <div className="p-3 rounded-md bg-red-950/50 border border-red-900/50 text-red-400 text-sm">
+                      {error}
+                    </div>
+                  )}
+
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-white text-black hover:bg-neutral-200 py-6 text-base font-semibold mt-4"
+                  >
+                    {loading ? "Deploying..." : "Deploy"}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          )}
         </div>
       </div>
     </div>

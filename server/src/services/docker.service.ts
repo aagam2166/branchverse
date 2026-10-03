@@ -118,6 +118,32 @@ export class DockerService {
             timestamps: true
         });
 
+        if (Buffer.isBuffer(logs)) {
+            let result = "";
+            let offset = 0;
+            while (offset < logs.length) {
+                // Check if it's a valid multiplexed header (type is 1 or 2, next 3 bytes are 0)
+                if (logs[offset] <= 2 && logs[offset + 1] === 0 && logs[offset + 2] === 0 && logs[offset + 3] === 0) {
+                    if (offset + 8 > logs.length) break;
+                    const payloadSize = logs.readUInt32BE(offset + 4);
+                    offset += 8;
+                    
+                    if (offset + payloadSize > logs.length) {
+                        result += logs.toString("utf8", offset);
+                        break;
+                    }
+                    
+                    result += logs.toString("utf8", offset, offset + payloadSize);
+                    offset += payloadSize;
+                } else {
+                    // Not a multiplexed stream (maybe Tty=true), just return the rest as string
+                    result += logs.toString("utf8", offset);
+                    break;
+                }
+            }
+            return result;
+        }
+
         return logs.toString();
     }
 

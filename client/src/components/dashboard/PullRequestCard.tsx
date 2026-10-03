@@ -1,24 +1,21 @@
 import { useState } from "react";
 import { 
-  GitBranch, 
-  GitCommit, 
-  User, 
-  ExternalLink, 
-  Terminal, 
-  RotateCw, 
-  Trash2, 
-  Columns, 
-  Clock,
-  AlertCircle,
-  History,
-  ChevronDown,
-  ChevronUp
+  GitBranch, GitCommit, Terminal, RotateCw, Trash2, Columns, 
+  CheckCircle2, CircleDashed, XCircle, ExternalLink
 } from "lucide-react";
-import { Button } from "../ui/button.js";
-import { StatusBadge } from "../ui/badge.js";
-import { shortenSha, timeAgo, formatDate } from "../../lib/utils.js";
+import { timeAgo } from "../../lib/utils.js";
 import type { PullRequest, Deployment } from "../../types/index.js";
 import { redeployPullRequest, destroyPreviewEnvironment } from "../../services/api.js";
+import { Button } from "../ui/button.js";
+import { StatusBadge } from "../ui/badge.js";
+
+const GithubIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+    <path d="M9 18c-4.51 2-5-2-7-2" />
+  </svg>
+);
+
 
 interface PullRequestCardProps {
   pullRequest: PullRequest;
@@ -34,12 +31,13 @@ export function PullRequestCard({
   onRefresh,
 }: PullRequestCardProps) {
   const [isActionLoading, setIsActionLoading] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
 
   const latestDeployment = pullRequest.deployments?.[0];
   const status = latestDeployment?.status || "CLOSED";
   const previewUrl = latestDeployment?.previewUrl;
-  const historyDeployments = pullRequest.deployments?.slice(1) || [];
+
+  const repoName = pullRequest.repository?.fullName?.split('/')[1] || "repository";
+  const repoFullName = pullRequest.repository?.fullName || "branchverse/repository";
 
   const handleRedeploy = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -69,181 +67,72 @@ export function PullRequestCard({
   };
 
   return (
-    <div className="glass-panel glass-panel-hover rounded-xl p-6 relative overflow-hidden group">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-2 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="font-mono text-xs font-semibold text-cyan-400">
-              #{pullRequest.number}
-            </span>
-            <span className="text-xs text-slate-500">•</span>
-            <span className="text-xs font-medium text-slate-400">
-              {pullRequest.repository?.fullName || "branchverse/repository"}
-            </span>
-            <StatusBadge status={status} />
+    <div className="bg-[#000] border border-[#333] hover:border-[#666] transition-all rounded-xl p-6 flex flex-col gap-6 cursor-pointer group shadow-sm hover:shadow-md hover:shadow-black">
+      <div className="flex justify-between items-start">
+        <div className="flex gap-4 items-center">
+          {/* Vercel-like project icon */}
+          <div className="h-10 w-10 bg-slate-900 border border-slate-700 rounded-full flex items-center justify-center shrink-0">
+             <GitBranch className="text-slate-300 h-5 w-5" />
           </div>
-
-          <h3 className="font-heading text-lg font-bold text-slate-100 group-hover:text-cyan-300 transition-colors">
-            {pullRequest.title}
-          </h3>
-
-          <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-slate-400">
-            <div className="flex items-center gap-1.5 rounded-md bg-slate-900/80 px-2.5 py-1 border border-slate-800">
-              <GitBranch className="h-3.5 w-3.5 text-cyan-400" />
-              <span className="font-mono text-[11px] text-cyan-300 truncate max-w-[140px]">
-                {pullRequest.branch}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-1.5 rounded-md bg-slate-900/80 px-2.5 py-1 border border-slate-800">
-              <GitCommit className="h-3.5 w-3.5 text-slate-400" />
-              <span className="font-mono text-[11px] text-slate-300">
-                {shortenSha(pullRequest.latestCommitSha)}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-1.5 text-slate-400">
-              <User className="h-3.5 w-3.5 text-slate-500" />
-              <span>{pullRequest.author}</span>
-            </div>
-
-            <div className="flex items-center gap-1 text-slate-500">
-              <Clock className="h-3.5 w-3.5" />
-              <span>{timeAgo(pullRequest.updatedAt)}</span>
-            </div>
+          <div className="flex flex-col">
+            <h3 className="text-lg font-bold font-heading text-slate-100 group-hover:text-white transition-colors flex items-center gap-2">
+              {repoName}
+            </h3>
+            {previewUrl ? (
+              <a href={previewUrl.startsWith('http') ? previewUrl : `https://${previewUrl}`} target="_blank" rel="noreferrer" className="text-sm text-slate-400 hover:text-cyan-400 transition-colors truncate max-w-[400px]" onClick={e => e.stopPropagation()}>
+                {previewUrl.replace(/^https?:\/\//, '')}
+              </a>
+            ) : (
+              <span className="text-sm text-slate-500">No preview URL</span>
+            )}
           </div>
         </div>
-
-        <div className="flex flex-wrap items-center gap-2 shrink-0 sm:self-start">
-          {latestDeployment && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpenLogs(pullRequest, latestDeployment);
-              }}
-              className="gap-1.5 text-xs border-slate-800 hover:border-slate-700 text-slate-300 cursor-pointer"
-            >
-              <Terminal className="h-3.5 w-3.5 text-cyan-400" />
-              <span>Logs</span>
-            </Button>
-          )}
-
-          {status === "LIVE" && previewUrl && latestDeployment && (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onOpenComparison(pullRequest, latestDeployment);
-                }}
-                className="gap-1.5 text-xs border-slate-800 hover:border-slate-700 text-cyan-300 cursor-pointer"
-              >
-                <Columns className="h-3.5 w-3.5 text-cyan-400" />
-                <span className="hidden sm:inline">Compare</span>
-              </Button>
-
-              <a
-                href={previewUrl}
-                target="_blank"
-                rel="noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-cyan-500 px-3 py-1.5 text-xs font-semibold text-slate-950 shadow-md shadow-cyan-950/40 hover:bg-cyan-400 transition-all hover:scale-[1.02] cursor-pointer"
-              >
-                <ExternalLink className="h-3.5 w-3.5" />
-                <span>Visit Preview</span>
-              </a>
-            </>
-          )}
-
-          <Button
-            variant="outline"
-            size="iconSm"
-            onClick={handleRedeploy}
-            disabled={isActionLoading}
-            className="border-slate-800 text-slate-400 hover:text-slate-200 cursor-pointer"
-            title="Redeploy Preview"
-          >
-            <RotateCw className={`h-3.5 w-3.5 ${isActionLoading ? "animate-spin text-cyan-400" : ""}`} />
-          </Button>
-
-          {status === "LIVE" && latestDeployment && (
-            <Button
-              variant="destructive"
-              size="iconSm"
-              onClick={handleDestroy}
-              disabled={isActionLoading}
-              className="cursor-pointer"
-              title="Tear Down Preview"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </Button>
-          )}
-
-          {historyDeployments.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowHistory(!showHistory)}
-              className="gap-1 text-xs text-slate-400 hover:text-slate-200 cursor-pointer"
-            >
-              <History className="h-3.5 w-3.5" />
-              <span>{historyDeployments.length}</span>
-              {showHistory ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-            </Button>
-          )}
+        <div className="flex items-center gap-4">
+           {/* Actions only appear on hover, status icon is always there */}
+           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-0">
+             {latestDeployment && (
+               <Button variant="ghost" size="icon" className="h-10 w-10 text-slate-400 hover:text-white hover:bg-[#333]" onClick={(e) => { e.stopPropagation(); onOpenLogs(pullRequest, latestDeployment); }} title="Logs">
+                 <Terminal className="h-5 w-5" />
+               </Button>
+             )}
+             {status === "LIVE" && latestDeployment && (
+               <Button variant="ghost" size="icon" className="h-10 w-10 text-slate-400 hover:text-white hover:bg-[#333]" onClick={(e) => { e.stopPropagation(); onOpenComparison(pullRequest, latestDeployment); }} title="Compare">
+                 <Columns className="h-5 w-5" />
+               </Button>
+             )}
+             {status === "LIVE" && previewUrl && (
+               <a href={previewUrl.startsWith('http') ? previewUrl : `https://${previewUrl}`} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()} className="inline-flex items-center justify-center h-10 w-10 rounded-md text-slate-400 hover:text-white hover:bg-[#333] transition-colors" title="Visit">
+                 <ExternalLink className="h-5 w-5" />
+               </a>
+             )}
+             <Button variant="ghost" size="icon" onClick={handleRedeploy} disabled={isActionLoading} className="h-10 w-10 text-slate-400 hover:text-white hover:bg-[#333]" title="Redeploy">
+               <RotateCw className={`h-5 w-5 ${isActionLoading ? 'animate-spin' : ''}`} />
+             </Button>
+             {status === "LIVE" && (
+               <Button variant="ghost" size="icon" onClick={handleDestroy} disabled={isActionLoading} className="h-10 w-10 text-rose-400 hover:text-rose-300 hover:bg-rose-950/50" title="Destroy">
+                 <Trash2 className="h-5 w-5" />
+               </Button>
+             )}
+           </div>
+           
+           <StatusBadge status={status as any} />
         </div>
       </div>
-
-      {latestDeployment?.errorMessage && (
-        <div className="mt-4 flex items-center gap-2 rounded-lg bg-rose-950/30 border border-rose-500/30 p-2.5 text-xs text-rose-300">
-          <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />
-          <span className="truncate">{latestDeployment.errorMessage}</span>
-        </div>
-      )}
-
-      {status === "LIVE" && latestDeployment?.hostPort && (
-        <div className="mt-4 pt-3 border-t border-slate-800/60 flex items-center justify-between text-xs text-slate-400">
-          <div className="flex items-center gap-2">
-            <span>Container port binding:</span>
-            <span className="font-mono text-cyan-300 font-medium">:{latestDeployment.hostPort}</span>
-          </div>
-          <div className="font-mono text-[11px] text-slate-500 truncate max-w-[200px]">
-            {latestDeployment.containerId?.slice(0, 12)}
-          </div>
-        </div>
-      )}
-
-      {showHistory && historyDeployments.length > 0 && (
-        <div className="mt-4 pt-3 border-t border-slate-800/80 space-y-2 bg-slate-950/50 p-3 rounded-lg animate-in fade-in duration-150">
-          <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-            <History className="h-3 w-3 text-cyan-400" />
-            <span>Previous Deployments History</span>
-          </div>
-          <div className="divide-y divide-slate-800/60">
-            {historyDeployments.map((dep) => (
-              <div key={dep.id} className="py-2 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2">
-                  <StatusBadge status={dep.status} />
-                  <span className="font-mono text-slate-400">{shortenSha(dep.commitSha)}</span>
-                  <span className="text-slate-500 text-[11px]">• {formatDate(dep.createdAt)}</span>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onOpenLogs(pullRequest, dep)}
-                  className="h-6 px-2 text-[11px] border-slate-800 gap-1 text-slate-300"
-                >
-                  <Terminal className="h-3 w-3 text-cyan-400" />
-                  <span>Logs</span>
-                </Button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      
+      <div className="flex flex-col gap-1.5">
+         <div className="flex items-center gap-2">
+            <GitCommit className="h-5 w-5 text-slate-300 shrink-0" />
+            <span className="text-base font-medium font-heading text-slate-200 truncate">{pullRequest.title}</span>
+         </div>
+         <div className="flex items-center gap-2 text-sm text-slate-500 mt-1 pl-1">
+            <GithubIcon className="h-4 w-4 shrink-0 text-slate-400" />
+            <span className="truncate">{repoFullName}</span>
+            <span className="shrink-0">•</span>
+            <span className="shrink-0">{timeAgo(pullRequest.updatedAt)}</span>
+            <span className="shrink-0">•</span>
+            <span className="shrink-0 font-mono text-xs font-semibold text-slate-400">PR #{pullRequest.number}</span>
+         </div>
+      </div>
     </div>
   );
 }

@@ -7,8 +7,6 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({ onOpenConnectModal, hasFilter }: EmptyStateProps) {
-  const webhookUrl = `${window.location.origin}/api/webhooks/github`;
-
   if (hasFilter) {
     return (
       <div className="glass-panel rounded-2xl p-12 text-center">
@@ -27,8 +25,8 @@ export function EmptyState({ onOpenConnectModal, hasFilter }: EmptyStateProps) {
 
   return (
     <div className="glass-panel rounded-2xl p-12 text-center border-dashed border-slate-800">
-      <div className="mx-auto relative flex h-16 w-16 items-center justify-center rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 shadow-xl shadow-cyan-950/50">
-        <GitPullRequest className="h-8 w-8 text-cyan-400" />
+      <div className="mx-auto relative flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-900 border border-slate-700 shadow-xl shadow-black/50">
+        <GitPullRequest className="h-8 w-8 text-slate-300" />
       </div>
 
       <h3 className="mt-5 font-heading text-xl font-bold text-slate-100">
@@ -40,23 +38,13 @@ export function EmptyState({ onOpenConnectModal, hasFilter }: EmptyStateProps) {
 
       <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
         <Button
-          variant="glow"
+          variant="default"
           onClick={onOpenConnectModal}
-          className="gap-2 cursor-pointer"
+          className="gap-2 cursor-pointer bg-white text-black hover:bg-neutral-200"
         >
           <FolderGit2 className="h-4 w-4" />
           <span>Connect Repository</span>
         </Button>
-      </div>
-
-      <div className="mt-8 mx-auto max-w-md rounded-xl bg-slate-950/80 p-4 border border-slate-800/80 text-left font-mono text-xs text-slate-400">
-        <div className="flex items-center gap-2 text-slate-500 mb-2 border-b border-slate-800 pb-2">
-          <Terminal className="h-3.5 w-3.5 text-cyan-400" />
-          <span>Webhook Setup Guide</span>
-        </div>
-        <p className="text-slate-300">Payload URL: <span className="text-cyan-400">{webhookUrl}</span></p>
-        <p className="text-slate-300">Content type: <span className="text-cyan-300">application/json</span></p>
-        <p className="text-slate-300">Events: <span className="text-amber-300">Pull requests</span></p>
       </div>
     </div>
   );

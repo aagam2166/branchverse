@@ -1,22 +1,19 @@
 import { useState, useRef, useEffect } from "react";
-import { GitPullRequest, RefreshCw, FolderGit2, LogOut, GitFork, ExternalLink, ChevronDown } from "lucide-react";
-import { Button } from "../ui/button.js";
+import { GitPullRequest, LogOut, Plus } from "lucide-react";
 import type { User } from "../../services/api.js";
 
 interface NavbarProps {
-  onRefresh: () => void;
-  isRefreshing: boolean;
+
   onOpenConnectModal: () => void;
   user: User | null;
   onLogout: () => void;
   onLogin: () => void;
 }
 
-export function Navbar({ onRefresh, isRefreshing, onOpenConnectModal, user, onLogout, onLogin }: NavbarProps) {
+export function Navbar({ onOpenConnectModal, user, onLogout, onLogin }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Close menu on click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -28,120 +25,113 @@ export function Navbar({ onRefresh, isRefreshing, onOpenConnectModal, user, onLo
   }, []);
 
   const handleSwitchAccount = () => {
-    // 1. Log out locally from BranchVerse
     onLogout();
-    // 2. Open GitHub logout in a new tab so user can sign into another account
     window.open("https://github.com/logout", "_blank");
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-800/80 bg-[#07090e]/90 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
-            <GitPullRequest className="h-5 w-5 text-cyan-400" />
+    <header className="sticky top-0 z-40 border-b border-[#222] bg-[#0a0a0a] text-white">
+      <div className="flex h-[64px] items-center justify-between px-4 sm:px-6 w-full">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-black">
+              <GitPullRequest className="h-5 w-5" />
+            </div>
+            <span className="font-bold text-lg tracking-tight">
+              BranchVerse
+            </span>
           </div>
-          <span className="font-heading text-xl font-bold tracking-tight text-slate-100">
-            BranchVerse
-          </span>
+          
+          <div className="hidden md:flex items-center gap-2 ml-1">
+            <span className="text-xl font-light text-[#444] mb-0.5">/</span>
+            <div className="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-white/5 transition-colors cursor-pointer group">
+              {user ? (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-[#a1a1aa] group-hover:text-white transition-colors">
+                    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+                    <path d="M9 18c-4.51 2-5-2-7-2" />
+                  </svg>
+                  <span className="text-base text-[#a1a1aa] font-medium group-hover:text-white transition-colors">
+                    {user.username}
+                  </span>
+                </>
+              ) : (
+                <span className="text-base text-[#a1a1aa] font-medium group-hover:text-white transition-colors">
+                  Workspace
+                </span>
+              )}
+            </div>
+          </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onRefresh}
-            disabled={isRefreshing}
-            className="border-slate-800 hover:border-slate-700 text-slate-300 gap-1.5 cursor-pointer"
-          >
-            <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin text-cyan-400" : ""}`} />
-            <span className="hidden sm:inline">Refresh</span>
-          </Button>
-
-          <Button
-            variant="glow"
-            size="sm"
-            onClick={onOpenConnectModal}
-            className="gap-1.5 text-xs cursor-pointer"
-          >
-            <FolderGit2 className="h-4 w-4" />
-            <span>Connect Repository</span>
-          </Button>
-
           {user ? (
-            <div className="relative pl-2 border-l border-slate-800" ref={menuRef}>
+            <>
               <button
-                onClick={() => setMenuOpen(!menuOpen)}
-                className="flex items-center gap-2 rounded-xl p-1.5 hover:bg-slate-800/60 border border-transparent hover:border-slate-700/60 transition-all cursor-pointer"
-                title="Account menu"
+                onClick={onOpenConnectModal}
+                className="hidden sm:flex h-8 items-center gap-1.5 rounded-md bg-white text-black px-3 py-1 text-sm font-medium hover:bg-neutral-200 transition-colors"
               >
-                {user.avatarUrl ? (
-                  <img
-                    src={user.avatarUrl}
-                    alt={user.username}
-                    className="h-8 w-8 rounded-full border border-cyan-500/40 object-cover"
-                  />
-                ) : (
-                  <div className="h-8 w-8 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-xs">
-                    {user.username.charAt(0).toUpperCase()}
-                  </div>
-                )}
-                <span className="hidden md:inline text-xs text-slate-300 font-semibold max-w-[120px] truncate">
-                  {user.username}
-                </span>
-                <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
+                <Plus className="h-4 w-4" />
+                <span>New Project</span>
               </button>
 
-              {menuOpen && (
-                <div className="absolute right-0 mt-2 w-64 rounded-xl border border-slate-800 bg-[#0d121f] p-3 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150 z-50">
-                  <div className="border-b border-slate-800/80 pb-3 mb-2 px-1">
-                    <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider">Signed in as</p>
-                    <p className="text-sm font-bold text-slate-100 truncate">@{user.username}</p>
-                    {user.email && (
-                      <p className="text-xs text-slate-400 truncate mt-0.5">{user.email}</p>
-                    )}
-                  </div>
+              <div className="relative ml-2" ref={menuRef}>
+                <button
+                  onClick={() => setMenuOpen(!menuOpen)}
+                  className="flex items-center gap-2 rounded-full border border-[#333] p-0.5 hover:border-[#666] transition-all cursor-pointer bg-[#111]"
+                >
+                  {user.avatarUrl ? (
+                    <img
+                      src={user.avatarUrl}
+                      alt={user.username}
+                      className="h-7 w-7 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-7 w-7 rounded-full bg-[#222] text-[#fff] flex items-center justify-center font-bold text-xs">
+                      {user.username.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </button>
 
-                  <div className="space-y-1">
+                {menuOpen && (
+                  <div className="absolute right-0 mt-2 w-56 rounded-md border border-[#333] bg-[#0a0a0a] p-1 shadow-xl animate-in fade-in duration-150 z-50">
+                    <div className="px-3 py-2 border-b border-[#222] mb-1">
+                      <p className="text-sm font-medium text-white truncate">@{user.username}</p>
+                      {user.email && (
+                        <p className="text-xs text-[#888] truncate">{user.email}</p>
+                      )}
+                    </div>
                     <button
                       onClick={() => {
                         setMenuOpen(false);
                         onLogout();
                       }}
-                      className="w-full flex items-center gap-2.5 px-2.5 py-2 text-xs font-medium text-slate-300 hover:text-rose-400 hover:bg-slate-800/70 rounded-lg transition-colors cursor-pointer text-left"
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#a1a1aa] hover:text-white hover:bg-[#222] rounded transition-colors text-left"
                     >
                       <LogOut className="h-4 w-4" />
-                      <span>Log Out of BranchVerse</span>
+                      <span>Log Out</span>
                     </button>
-
                     <button
                       onClick={() => {
                         setMenuOpen(false);
                         handleSwitchAccount();
                       }}
-                      className="w-full flex items-center justify-between px-2.5 py-2 text-xs font-medium text-amber-400 hover:bg-slate-800/70 rounded-lg transition-colors cursor-pointer text-left"
-                      title="Log out of GitHub to sign in with a different account"
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#a1a1aa] hover:text-white hover:bg-[#222] rounded transition-colors text-left"
                     >
-                      <div className="flex items-center gap-2.5">
-                        <GitFork className="h-4 w-4" />
-                        <span>Switch GitHub Account</span>
-                      </div>
-                      <ExternalLink className="h-3 w-3 opacity-70" />
+                      <GitPullRequest className="h-4 w-4" />
+                      <span>Switch Account</span>
                     </button>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            </>
           ) : (
-            <Button
-              variant="outline"
-              size="sm"
+            <button
               onClick={onLogin}
-              className="bg-slate-900 border-slate-700 hover:border-cyan-500/50 text-slate-200 gap-1.5 text-xs cursor-pointer"
+              className="h-8 flex items-center gap-1.5 rounded-md bg-white text-black px-4 text-sm font-medium hover:bg-neutral-200 transition-colors cursor-pointer"
             >
-              <GitFork className="h-4 w-4 text-slate-300" />
-              <span>Login with GitHub</span>
-            </Button>
+              <span>Login</span>
+            </button>
           )}
         </div>
       </div>

@@ -8,16 +8,16 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-slate-800 text-slate-200 border border-slate-700",
-        LIVE: "bg-cyan-950/70 text-cyan-300 border border-cyan-500/40 shadow-[0_0_12px_rgba(6,182,212,0.25)]",
-        BUILDING: "bg-amber-950/70 text-amber-300 border border-amber-500/40 shadow-[0_0_12px_rgba(245,158,11,0.2)] animate-pulse",
-        DEPLOYING: "bg-blue-950/70 text-blue-300 border border-blue-500/40 shadow-[0_0_12px_rgba(59,130,246,0.25)] animate-pulse",
-        BUILD_FAILED: "bg-rose-950/70 text-rose-300 border border-rose-500/40 shadow-[0_0_12px_rgba(244,63,94,0.25)]",
-        CLOSED: "bg-slate-800/80 text-slate-400 border border-slate-700/60",
-        MERGED: "bg-purple-950/70 text-purple-300 border border-purple-500/40 shadow-[0_0_12px_rgba(168,85,247,0.2)]",
-        EXPIRED: "bg-slate-800/80 text-slate-400 border border-slate-700/60",
-        SUPERSEDED: "bg-slate-800/80 text-slate-400 border border-slate-700/60",
-        branch: "bg-slate-900/90 text-cyan-300 border border-cyan-500/20 font-mono text-[11px]",
+        default: "bg-[#fff] text-[#000] hover:bg-[#e5e5e5] border-transparent",
+        LIVE: "bg-[#002b18] text-[#00e676] border-transparent shadow-[0_0_8px_rgba(0,230,118,0.2)]",
+        BUILDING: "bg-[#451a03] text-[#f59e0b] border-transparent shadow-[0_0_8px_rgba(245,158,11,0.2)] animate-pulse",
+        DEPLOYING: "bg-[#451a03] text-[#f59e0b] border-transparent shadow-[0_0_8px_rgba(245,158,11,0.2)] animate-pulse",
+        BUILD_FAILED: "bg-[#4c0519] text-[#ff5555] border-transparent shadow-[0_0_8px_rgba(255,85,85,0.2)]",
+        CLOSED: "bg-[#111] text-[#888] border border-[#333]",
+        MERGED: "bg-[#3b0764] text-[#a855f7] border-transparent shadow-[0_0_8px_rgba(168,85,247,0.2)]",
+        EXPIRED: "bg-[#111] text-[#888] border border-[#333]",
+        SUPERSEDED: "bg-[#111] text-[#888] border border-[#333]",
+        branch: "bg-[#111] text-[#fff] border border-[#333] hover:bg-[#222] font-mono text-[11px]",
       },
     },
     defaultVariants: {
@@ -40,19 +40,19 @@ export function StatusBadge({ status }: { status: DeploymentStatus }) {
   const getStatusDot = (status: DeploymentStatus) => {
     switch (status) {
       case "LIVE":
-        return <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 inline-block" />;
+        return <span className="h-1.5 w-1.5 rounded-full bg-[#00e676] inline-block shadow-[0_0_6px_rgba(0,230,118,0.6)]" />;
       case "BUILDING":
       case "DEPLOYING":
-        return <span className="h-1.5 w-1.5 rounded-full bg-amber-400 inline-block" />;
+        return <span className="h-1.5 w-1.5 rounded-full bg-[#f59e0b] inline-block shadow-[0_0_6px_rgba(245,158,11,0.6)]" />;
       case "BUILD_FAILED":
-        return <span className="h-1.5 w-1.5 rounded-full bg-rose-400 inline-block" />;
+        return <span className="h-1.5 w-1.5 rounded-full bg-[#ff3333] inline-block shadow-[0_0_6px_rgba(255,51,51,0.6)]" />;
       case "MERGED":
-        return <span className="h-1.5 w-1.5 rounded-full bg-purple-400 inline-block" />;
+        return <span className="h-1.5 w-1.5 rounded-full bg-[#a855f7] inline-block shadow-[0_0_6px_rgba(168,85,247,0.6)]" />;
       case "CLOSED":
       case "EXPIRED":
       case "SUPERSEDED":
       default:
-        return <span className="h-1.5 w-1.5 rounded-full bg-slate-500 inline-block" />;
+        return <span className="h-1.5 w-1.5 rounded-full bg-[#888] inline-block" />;
     }
   };
 
