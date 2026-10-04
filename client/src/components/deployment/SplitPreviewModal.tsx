@@ -41,7 +41,10 @@ export function SplitPreviewModal({
   const previewFrameRef = useRef<HTMLIFrameElement>(null);
   const baselineFrameRef = useRef<HTMLIFrameElement>(null);
 
-  const previewUrl = deployment.previewUrl || `http://localhost:${deployment.hostPort || 3000}`;
+  const rawPreview = deployment.previewUrl || `http://172.198.162.244:${deployment.hostPort || 3000}`;
+  const previewUrl = window.location.hostname !== "localhost" && rawPreview.includes("localhost")
+    ? rawPreview.replace("localhost", "172.198.162.244")
+    : rawPreview;
 
   useEffect(() => {
     let intervalId: ReturnType<typeof setInterval>;

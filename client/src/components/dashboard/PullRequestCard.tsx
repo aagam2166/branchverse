@@ -34,7 +34,10 @@ export function PullRequestCard({
 
   const latestDeployment = pullRequest.deployments?.[0];
   const status = latestDeployment?.status || "CLOSED";
-  const previewUrl = latestDeployment?.previewUrl;
+  const rawPreviewUrl = latestDeployment?.previewUrl;
+  const previewUrl = rawPreviewUrl && window.location.hostname !== "localhost" && rawPreviewUrl.includes("localhost")
+    ? rawPreviewUrl.replace("localhost", "172.198.162.244")
+    : rawPreviewUrl;
 
   const repoName = pullRequest.repository?.fullName?.split('/')[1] || "repository";
   const repoFullName = pullRequest.repository?.fullName || "branchverse/repository";
