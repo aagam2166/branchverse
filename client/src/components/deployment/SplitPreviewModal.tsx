@@ -216,6 +216,25 @@ export function SplitPreviewModal({
           </div>
         </div>
 
+        {typeof window !== "undefined" && window.location.protocol === "https:" && (previewUrl.startsWith("http:") || baselineUrl.startsWith("http:")) && (
+          <div className="flex items-center justify-between gap-2 px-6 py-2 bg-amber-500/10 border-b border-amber-500/20 text-xs text-amber-300">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold">💡 Browser notice:</span>
+              <span>
+                If the preview box is blank, your browser is blocking HTTP frames on HTTPS. To unblock: click the URL bar lock/settings icon → <strong>Site settings</strong> → set <strong>Insecure content</strong> to <strong>Allow</strong>, then reload.
+              </span>
+            </div>
+            <a
+              href={previewUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-cyan-400 hover:text-cyan-300 underline shrink-0 font-medium ml-2"
+            >
+              Open Direct <ExternalLink className="h-3 w-3 inline" />
+            </a>
+          </div>
+        )}
+
         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-800 bg-[#04060a] overflow-hidden">
           <div className="flex flex-col items-center justify-start h-full p-2 overflow-auto bg-slate-950/40">
             <div className={`w-full ${getViewportWidth()} transition-all duration-300 flex-1 flex flex-col`}>
