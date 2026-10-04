@@ -1,11 +1,11 @@
 import { useState, useRef } from "react";
-import { 
-  Columns, 
-  ExternalLink, 
-  RefreshCw, 
-  X, 
-  Monitor, 
-  Tablet, 
+import {
+  Columns,
+  ExternalLink,
+  RefreshCw,
+  X,
+  Monitor,
+  Tablet,
   Smartphone,
   Globe,
   Sparkles
@@ -45,7 +45,7 @@ export function SplitPreviewModal({
 
   useEffect(() => {
     let intervalId: ReturnType<typeof setInterval>;
-    
+
     if (baselineStatus === "BUILDING" || baselineStatus === "DEPLOYING") {
       intervalId = setInterval(async () => {
         try {
@@ -59,7 +59,7 @@ export function SplitPreviewModal({
         }
       }, 3000);
     }
-    
+
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
@@ -98,7 +98,7 @@ export function SplitPreviewModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
       <div className="flex h-[92vh] w-full max-w-[96vw] flex-col rounded-2xl border border-slate-800 bg-[#090d16] shadow-2xl overflow-hidden">
-        
+
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 bg-slate-900/90 px-6 py-3">
           <div className="flex items-center gap-3">
             <div className="rounded-lg bg-cyan-500/10 p-2 border border-cyan-500/20">
@@ -123,27 +123,24 @@ export function SplitPreviewModal({
             <div className="flex items-center rounded-lg border border-slate-800 bg-slate-950 p-1">
               <button
                 onClick={() => setDeviceMode("desktop")}
-                className={`rounded p-1.5 transition-colors cursor-pointer ${
-                  deviceMode === "desktop" ? "bg-slate-800 text-cyan-400" : "text-slate-400 hover:text-slate-200"
-                }`}
+                className={`rounded p-1.5 transition-colors cursor-pointer ${deviceMode === "desktop" ? "bg-slate-800 text-cyan-400" : "text-slate-400 hover:text-slate-200"
+                  }`}
                 title="Desktop (100%)"
               >
                 <Monitor className="h-4 w-4" />
               </button>
               <button
                 onClick={() => setDeviceMode("tablet")}
-                className={`rounded p-1.5 transition-colors cursor-pointer ${
-                  deviceMode === "tablet" ? "bg-slate-800 text-cyan-400" : "text-slate-400 hover:text-slate-200"
-                }`}
+                className={`rounded p-1.5 transition-colors cursor-pointer ${deviceMode === "tablet" ? "bg-slate-800 text-cyan-400" : "text-slate-400 hover:text-slate-200"
+                  }`}
                 title="Tablet (768px)"
               >
                 <Tablet className="h-4 w-4" />
               </button>
               <button
                 onClick={() => setDeviceMode("mobile")}
-                className={`rounded p-1.5 transition-colors cursor-pointer ${
-                  deviceMode === "mobile" ? "bg-slate-800 text-cyan-400" : "text-slate-400 hover:text-slate-200"
-                }`}
+                className={`rounded p-1.5 transition-colors cursor-pointer ${deviceMode === "mobile" ? "bg-slate-800 text-cyan-400" : "text-slate-400 hover:text-slate-200"
+                  }`}
                 title="Mobile (390px)"
               >
                 <Smartphone className="h-4 w-4" />
@@ -256,7 +253,7 @@ export function SplitPreviewModal({
                   <p className="text-xs text-slate-500 max-w-[250px] mb-6">
                     Deploy the main branch to compare this PR against your baseline.
                   </p>
-                  
+
                   {(baselineStatus === "BUILDING" || baselineStatus === "DEPLOYING") ? (
                     <div className="flex flex-col items-center gap-3">
                       <RefreshCw className="h-5 w-5 text-cyan-400 animate-spin" />
@@ -265,8 +262,8 @@ export function SplitPreviewModal({
                       </span>
                     </div>
                   ) : (
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       onClick={handleDeployBaseline}
                       disabled={isDeployingBaseline}
                       className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-950/40"

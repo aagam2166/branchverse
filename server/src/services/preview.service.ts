@@ -182,7 +182,8 @@ export const deployPreview = async (
             containerPort
         );
 
-        const previewUrl = `http://localhost:${hostPort}`;
+        const serverHost = process.env.SERVER_HOST || "localhost";
+        const previewUrl = `http://${serverHost}:${hostPort}`;
         buildLogs.push(`Preview LIVE at ${previewUrl}`);
 
         const expiresAt = new Date();

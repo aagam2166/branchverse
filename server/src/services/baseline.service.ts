@@ -151,7 +151,8 @@ export const deployBaseline = async (
         await dockerService.startContainer(containerId);
 
         const hostPort = await dockerService.getContainerPort(containerId, containerPort);
-        const baselineUrl = `http://localhost:${hostPort}`;
+        const serverHost = process.env.SERVER_HOST || "localhost";
+        const baselineUrl = `http://${serverHost}:${hostPort}`;
 
         await prisma.repository.update({
             where: { id: repositoryId },
