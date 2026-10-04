@@ -35,3 +35,20 @@ export function timeAgo(dateString?: string | Date | null): string {
   const days = Math.floor(hours / 24);
   return `${days}d ago`;
 }
+
+export function timeRemaining(dateString?: string | Date | null): string {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  const now = new Date();
+  const seconds = Math.floor((date.getTime() - now.getTime()) / 1000);
+
+  if (seconds <= 0) return "soon";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `in ${minutes}m`;
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  if (hours < 24) return `in ${hours}h ${remainingMinutes}m`;
+  const days = Math.floor(hours / 24);
+  const remainingHours = hours % 24;
+  return `in ${days}d ${remainingHours}h`;
+}

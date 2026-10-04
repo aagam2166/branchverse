@@ -185,7 +185,6 @@ export function DashboardPage() {
               onSearchChange={setSearchQuery}
               statusFilter={statusFilter}
               onStatusFilterChange={setStatusFilter}
-              totalFiltered={filteredPRs.length}
             />
 
             {loading ? (

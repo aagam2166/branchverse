@@ -6,7 +6,6 @@ interface FilterBarProps {
   onSearchChange: (query: string) => void;
   statusFilter: string;
   onStatusFilterChange: (status: string) => void;
-  totalFiltered: number;
 }
 
 export function FilterBar({
@@ -14,7 +13,6 @@ export function FilterBar({
   onSearchChange,
   statusFilter,
   onStatusFilterChange,
-  totalFiltered,
 }: FilterBarProps) {
   const filters = [
     { label: "All", value: "ALL" },

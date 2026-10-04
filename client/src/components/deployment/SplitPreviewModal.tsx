@@ -8,8 +8,7 @@ import {
   Tablet, 
   Smartphone,
   Globe,
-  Sparkles,
-  Link2
+  Sparkles
 } from "lucide-react";
 import { Button } from "../ui/button.js";
 import type { PullRequest, Deployment } from "../../types/index.js";

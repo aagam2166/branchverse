@@ -3,7 +3,7 @@ import fs from "fs";
 import dockerService from "./docker.service.js";
 import { cloneAtCommit, cleanupWorkspace } from "./git.service.js";
 import { prisma } from "../lib/prisma.js";
-import { Octokit } from "@octokit/rest";
+
 import type { DeployPreviewRequest, DeployPreviewResult } from "../types/deployment.js";
 
 const PREVIEW_DOCKERFILE = path.resolve("docker", "Dockerfile.preview");
@@ -119,6 +119,34 @@ export const deployPreview = async (
                     dockerfileContent = lines.join("\n");
                     buildLogs.push(`Injected custom build command: ${repoConfig.buildCommand}`);
                 }
+            } else if (detectedType === "NODE") {
+                const packageJsonPath = path.join(appPath, "package.json");
+                if (fs.existsSync(packageJsonPath)) {
+                    try {
+                        const pkg = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
+                        if (pkg.scripts?.build) {
+                            const lines = dockerfileContent.split("\n");
+                            const insertIndex = lines.findIndex(l => l.startsWith("EXPOSE") || l.startsWith("CMD"));
+                            if (insertIndex !== -1) {
+                                lines.splice(insertIndex, 0, `RUN npm run build`);
+                                dockerfileContent = lines.join("\n");
+                                buildLogs.push(`Auto-injected build command: npm run build`);
+                            }
+                        }
+                        
+                        let finalCmd = 'CMD ["npm", "start"]';
+                        if (!pkg.scripts?.start) {
+                            if (pkg.scripts?.preview) {
+                                finalCmd = 'CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0", "--port", "3000"]';
+                            } else if (pkg.scripts?.dev) {
+                                finalCmd = 'CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]';
+                            }
+                        }
+                        dockerfileContent = dockerfileContent.replace(/CMD \["npm", "start"\]/, finalCmd);
+                    } catch (e) {
+                        console.error("Failed to parse package.json", e);
+                    }
+                }
             }
 
             fs.writeFileSync(dockerfilePath, dockerfileContent);
@@ -168,36 +196,6 @@ export const deployPreview = async (
             buildLogs: buildLogs.join("\n"),
             expiresAt,
         });
-
-        const deploymentRecord = await prisma.deployment.findUnique({
-            where: { id: deploymentId },
-            include: { pullRequest: true },
-        });
-
-        if (deploymentRecord?.pullRequest) {
-            const [owner, repo] = repositoryFullName.split("/");
-            if (owner && repo) {
-                try {
-                    const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN?.trim() });
-
-                    await octokit.issues.createComment({
-                        owner,
-                        repo,
-                        issue_number: deploymentRecord.pullRequest.number,
-                        body: `**BranchVerse Preview is LIVE!**\n\n- **Commit**: \`${commitSha.substring(0, 7)}\`\n- **Preview URL**: [${previewUrl}](${previewUrl})\n\n_Deployed automatically by BranchVerse._`,
-                    });
-                    buildLogs.push("Posted preview URL comment to GitHub PR");
-                } catch (err) {
-                    console.error("Failed to post PR comment", err);
-                    buildLogs.push("Warning: Failed to post PR comment to GitHub");
-                }
-
-                // Update logs again to include the comment action
-                await updateDeploymentInDb(deploymentId, {
-                    buildLogs: buildLogs.join("\n")
-                });
-            }
-        }
 
         return {
             status: "LIVE",

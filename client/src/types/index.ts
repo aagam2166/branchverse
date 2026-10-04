@@ -37,6 +37,7 @@ export interface Deployment {
   hostPort: number | null;
   buildLogs: string | null;
   errorMessage: string | null;
+  expiresAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }

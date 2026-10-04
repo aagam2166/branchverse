@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { 
   GitBranch, GitCommit, Terminal, RotateCw, Trash2, Columns, 
-  CheckCircle2, CircleDashed, XCircle, ExternalLink
+  ExternalLink, Timer
 } from "lucide-react";
-import { timeAgo } from "../../lib/utils.js";
+import { timeAgo, timeRemaining } from "../../lib/utils.js";
 import type { PullRequest, Deployment } from "../../types/index.js";
-import { redeployPullRequest, destroyPreviewEnvironment } from "../../services/api.js";
+import { redeployPullRequest, destroyPreviewEnvironment, expireDeployment } from "../../services/api.js";
 import { Button } from "../ui/button.js";
 import { StatusBadge } from "../ui/badge.js";
 
@@ -66,6 +66,20 @@ export function PullRequestCard({
     }
   };
 
+  const handleExpire = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!latestDeployment) return;
+    try {
+      setIsActionLoading(true);
+      await expireDeployment(latestDeployment.id);
+      onRefresh();
+    } catch (err) {
+      console.error("Expire error:", err);
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
   return (
     <div className="bg-[#000] border border-[#333] hover:border-[#666] transition-all rounded-xl p-6 flex flex-col gap-6 cursor-pointer group shadow-sm hover:shadow-md hover:shadow-black">
       <div className="flex justify-between items-start">
@@ -113,6 +127,11 @@ export function PullRequestCard({
                  <Trash2 className="h-5 w-5" />
                </Button>
              )}
+             {status === "LIVE" && (
+               <Button variant="ghost" size="icon" onClick={handleExpire} disabled={isActionLoading} className="h-10 w-10 text-amber-400 hover:text-amber-300 hover:bg-amber-950/50" title="Test Expiry">
+                 <Timer className="h-5 w-5" />
+               </Button>
+             )}
            </div>
            
            <StatusBadge status={status as any} />
@@ -131,6 +150,14 @@ export function PullRequestCard({
             <span className="shrink-0">{timeAgo(pullRequest.updatedAt)}</span>
             <span className="shrink-0">•</span>
             <span className="shrink-0 font-mono text-xs font-semibold text-slate-400">PR #{pullRequest.number}</span>
+            {latestDeployment?.expiresAt && status === "LIVE" && (
+              <>
+                <span className="shrink-0">•</span>
+                <span className="shrink-0 text-amber-400/80 text-xs">
+                  Expires {timeRemaining(latestDeployment.expiresAt)}
+                </span>
+              </>
+            )}
          </div>
       </div>
     </div>

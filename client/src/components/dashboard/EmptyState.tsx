@@ -1,4 +1,4 @@
-import { GitPullRequest, FolderGit2, Terminal } from "lucide-react";
+import { GitPullRequest, FolderGit2 } from "lucide-react";
 import { Button } from "../ui/button.js";
 
 interface EmptyStateProps {

@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
 import dockerService from "../services/docker.service.js";
 import type { AuthRequest } from "../middlewares/auth.middleware.js";
+import { destroyPreview } from "../services/preview.service.js";
 
 export const listPullRequests = async (req: AuthRequest, res: Response) => {
     try {
@@ -92,5 +93,32 @@ export const getDeploymentLogs = async (req: Request, res: Response) => {
     } catch (error) {
         console.error("Failed to get logs:", error);
         res.status(500).json({ error: "Failed to fetch logs" });
+    }
+};
+
+export const expireDeployment = async (req: Request, res: Response) => {
+    try {
+        const deploymentId = String(req.params["deploymentId"]);
+
+        const deployment = await prisma.deployment.findUnique({
+            where: { id: deploymentId },
+        });
+
+        if (!deployment) {
+            res.status(404).json({ error: "Deployment not found" });
+            return;
+        }
+
+        await destroyPreview(deployment.id);
+        
+        await prisma.deployment.update({
+            where: { id: deployment.id },
+            data: { status: "EXPIRED" } as any,
+        });
+
+        res.json({ message: "Deployment expired successfully" });
+    } catch (error) {
+        console.error("Failed to expire deployment:", error);
+        res.status(500).json({ error: "Failed to expire deployment" });
     }
 };

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Terminal, X, Copy, Check, Search, Download, ArrowDown } from "lucide-react";
+import { Terminal, X, Copy, Check, Search, Download } from "lucide-react";
 import { Button } from "../ui/button.js";
 import { Input } from "../ui/input.js";
 import { fetchDeploymentLogs } from "../../services/api.js";
@@ -24,7 +24,7 @@ export function LogViewerModal({
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [autoScroll, setAutoScroll] = useState(true);
+  const [autoScroll] = useState(true);
   const logsEndRef = useRef<HTMLDivElement>(null);
 
   const [selectedDeploymentId, setSelectedDeploymentId] = useState<string>("");

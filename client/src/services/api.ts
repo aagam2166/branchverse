@@ -145,6 +145,15 @@ export const destroyPreviewEnvironment = async (
   return response.data;
 };
 
+export const expireDeployment = async (
+  deploymentId: string
+): Promise<{ message: string }> => {
+  const response = await api.post<{ message: string }>(
+    `/deployments/${deploymentId}/expire`
+  );
+  return response.data;
+};
+
 export const triggerSimulatedWebhook = async (payload: {
   action: "opened" | "synchronize" | "closed";
   number: number;
