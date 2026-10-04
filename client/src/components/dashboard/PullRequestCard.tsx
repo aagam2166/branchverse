@@ -3,7 +3,7 @@ import {
   GitBranch, GitCommit, Terminal, RotateCw, Trash2, Columns, 
   ExternalLink, Timer
 } from "lucide-react";
-import { timeAgo, timeRemaining } from "../../lib/utils.js";
+import { timeAgo, timeRemaining, formatHostUrl } from "../../lib/utils.js";
 import type { PullRequest, Deployment } from "../../types/index.js";
 import { redeployPullRequest, destroyPreviewEnvironment, expireDeployment } from "../../services/api.js";
 import { Button } from "../ui/button.js";
@@ -34,10 +34,7 @@ export function PullRequestCard({
 
   const latestDeployment = pullRequest.deployments?.[0];
   const status = latestDeployment?.status || "CLOSED";
-  const rawPreviewUrl = latestDeployment?.previewUrl;
-  const previewUrl = rawPreviewUrl && window.location.hostname !== "localhost" && rawPreviewUrl.includes("localhost")
-    ? rawPreviewUrl.replace("localhost", "172.198.162.244")
-    : rawPreviewUrl;
+  const previewUrl = formatHostUrl(latestDeployment?.previewUrl);
 
   const repoName = pullRequest.repository?.fullName?.split('/')[1] || "repository";
   const repoFullName = pullRequest.repository?.fullName || "branchverse/repository";

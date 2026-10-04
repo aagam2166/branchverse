@@ -14,6 +14,7 @@ import { Button } from "../ui/button.js";
 import type { PullRequest, Deployment } from "../../types/index.js";
 import { deployBaseline, fetchBaselineStatus } from "../../services/api.js";
 import { useEffect } from "react";
+import { formatHostUrl } from "../../lib/utils.js";
 
 interface SplitPreviewModalProps {
   isOpen: boolean;
@@ -30,7 +31,7 @@ export function SplitPreviewModal({
 }: SplitPreviewModalProps) {
   const [deviceMode, setDeviceMode] = useState<"desktop" | "tablet" | "mobile">("desktop");
   const [baselineUrl, setBaselineUrl] = useState<string>(
-    pullRequest.repository?.productionUrl || pullRequest.repository?.baselineUrl || ""
+    formatHostUrl(pullRequest.repository?.productionUrl || pullRequest.repository?.baselineUrl || "")
   );
   const [baselineStatus, setBaselineStatus] = useState<string | null>(
     pullRequest.repository?.baselineStatus || null
@@ -41,10 +42,7 @@ export function SplitPreviewModal({
   const previewFrameRef = useRef<HTMLIFrameElement>(null);
   const baselineFrameRef = useRef<HTMLIFrameElement>(null);
 
-  const rawPreview = deployment.previewUrl || `http://172.198.162.244:${deployment.hostPort || 3000}`;
-  const previewUrl = window.location.hostname !== "localhost" && rawPreview.includes("localhost")
-    ? rawPreview.replace("localhost", "172.198.162.244")
-    : rawPreview;
+  const previewUrl = formatHostUrl(deployment.previewUrl || `http://localhost:${deployment.hostPort || 3000}`);
 
   useEffect(() => {
     let intervalId: ReturnType<typeof setInterval>;
@@ -55,7 +53,7 @@ export function SplitPreviewModal({
           const status = await fetchBaselineStatus(pullRequest.repository.id);
           setBaselineStatus(status.status);
           if (status.status === "LIVE" && status.url) {
-            setBaselineUrl(status.url);
+            setBaselineUrl(formatHostUrl(status.url));
           }
         } catch (e) {
           console.error("Failed to fetch baseline status", e);

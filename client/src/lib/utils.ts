@@ -52,3 +52,12 @@ export function timeRemaining(dateString?: string | Date | null): string {
   const remainingHours = hours % 24;
   return `in ${days}d ${remainingHours}h`;
 }
+
+export function formatHostUrl(url?: string | null): string {
+  if (!url) return "";
+  const serverHost = import.meta.env.VITE_SERVER_HOST || "172.198.162.244";
+  if (typeof window !== "undefined" && window.location.hostname !== "localhost") {
+    return url.replace(/localhost/g, serverHost);
+  }
+  return url;
+}
